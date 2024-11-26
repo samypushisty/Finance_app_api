@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "finance-app-back"
+version = "0.1.0"
+description = ""
+authors = ["samypushisty <pomidorik228@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["all"], version = "^0.114.2"}
+sqlalchemy = "^2.0.35"
+alembic = "^1.13.2"
+asyncpg = "^0.29.0"
+psycopg2-binary = "^2.9.9"
+pyjwt = "^2.9.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
