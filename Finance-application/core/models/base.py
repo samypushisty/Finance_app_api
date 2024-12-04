@@ -1,68 +1,92 @@
-from datetime import datetime, timezone
+from datetime import datetime
+from decimal import Decimal
+from typing import Optional, Annotated
+from sqlalchemy import ForeignKey, text, String
+from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 
-from sqlalchemy import Column, Integer, String, TIMESTAMP, ForeignKey, CheckConstraint, Numeric, Boolean
-from sqlalchemy.orm import DeclarativeBase
+import enum
+
+str_5 = Annotated[str,5]
+str_50 = Annotated[str,50]
+str_256 = Annotated[str,256]
+intfk = Annotated[int, mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)]
+intpk = Annotated[int, mapped_column(primary_key=True)]
+
 
 class Base(DeclarativeBase):
-    pass
+    type_annotation_map = {
+        str_5: String(5),
+        str_50: String(50),
+        str_256: String(256)
+    }
 
+
+class Language(enum.Enum):
+    english = "en"
+    russian = "ru"
+
+class CashAccountType(enum.Enum):
+    cash = "cash"
+    card = "card"
+
+class MovieType(enum.Enum):
+    earning = "earning"
+    outlay = "outlay"
+
+class Theme(enum.Enum):
+    black = "black"
+    white = "white"
+    auto = "auto"
 
 # таблица с пользователями
 class User(Base):
     __tablename__ = "user"
 
-    id = Column(Integer, primary_key=True)
-    currencies = Column(String, nullable=False)
-    categories = Column(String)
-    type_of_earnings = Column(String)
+    id: Mapped[intpk]
+    currencies: Mapped[str]
+    categories: Mapped[Optional[str]]
+    type_of_earnings: Mapped[Optional[str]]
+
 
 # таблица с едой
 class CashAccount(Base):
     __tablename__ = "cash_account"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"))
-    balance = Column(Numeric, nullable=False)
-    name = Column(String, nullable=False)
-    type = Column(String, nullable=False)
-    currency = Column(Integer, nullable=False)
 
-    __table_args__ = (
-        CheckConstraint("type IN ('cash', 'card')", name='check_valid_type'),
-    )
+    id: Mapped[intpk]
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
+    balance: Mapped[float]
+    name: Mapped[str_50]
+    type: Mapped[CashAccountType]
+    currency: Mapped[str_5]
 
 
 # таблица с сетами
 class Setings(Base):
     __tablename__ = "settings"
-    id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"),primary_key=True)
-    theme = Column(String, nullable=False)
-    language = Column(String, nullable=False)
-    notifications = Column(Boolean, nullable=False)
-    main_currency = Column(String, nullable=False)
 
-    __table_args__ = (
-        CheckConstraint("theme IN ('black', 'white', 'auto')", name='check_valid_type'),
-        CheckConstraint("language IN ('en', 'ru')", name='check_valid_type'),
-    )
+    id: Mapped[intfk]
+    theme: Mapped[Theme]
+    language: Mapped[Language]
+    notifications: Mapped[bool]
+    main_currency: Mapped[str_5]
+
 
 class MovieOnAccount(Base):
     __tablename__ = "movie_on_account"
-    id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    title = Column(String, nullable=False)
-    description = Column(String)
-    type = Column(String, nullable=False)
-    worth = Column(Numeric, nullable=False)
-    cash_account = Column(Integer, ForeignKey("cash_account.id", ondelete="CASCADE"))
-    categories_name = Column(String, nullable=False)
-    earnings_type = Column(String, nullable=False)
-    time = Column(TIMESTAMP, default=datetime.now(timezone.utc).replace(tzinfo=None))
 
-    __table_args__ = (
-        CheckConstraint("type IN ('earning', 'outlay')", name='check_valid_type'),
-    )
+    id: Mapped[intfk]
+    title: Mapped[str_50]
+    description: Mapped[Optional[str_256]]
+    type: Mapped[MovieType]
+    worth: Mapped[Decimal]
+    cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.id", ondelete="CASCADE"))
+    categories_name: Mapped[str]
+    earnings_type: Mapped[str]
+    time: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
+
 
 class Balance(Base):
     __tablename__ = "balance"
-    id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    total_balance = Column(Numeric, nullable=False)
-    balances_history = Column(String,nullable=False)
+    id: Mapped[intfk]
+    total_balance: Mapped[float]
+    balances_history: Mapped[str]
