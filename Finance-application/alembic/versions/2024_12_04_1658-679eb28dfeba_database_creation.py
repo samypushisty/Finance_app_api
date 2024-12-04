@@ -1,8 +1,8 @@
 """DataBase creation
 
-Revision ID: 9e57d7c5cf4c
+Revision ID: 679eb28dfeba
 Revises: 
-Create Date: 2024-12-04 16:15:54.596366
+Create Date: 2024-12-04 16:58:06.920898
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '9e57d7c5cf4c'
+revision: str = '679eb28dfeba'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,14 +25,14 @@ def upgrade() -> None:
     sa.Column('currencies', sa.String(), nullable=False),
     sa.Column('categories', sa.String(), nullable=True),
     sa.Column('type_of_earnings', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_user'))
     )
     op.create_table('balance',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('total_balance', sa.Float(), nullable=False),
     sa.Column('balances_history', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['id'], ['user.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['id'], ['user.id'], name=op.f('fk_balance_id_user'), ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_balance'))
     )
     op.create_table('cash_account',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -41,8 +41,8 @@ def upgrade() -> None:
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('type', sa.Enum('cash', 'card', name='cashaccounttype'), nullable=False),
     sa.Column('currency', sa.String(length=5), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_cash_account_user_id_user'), ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_cash_account'))
     )
     op.create_table('settings',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -50,8 +50,8 @@ def upgrade() -> None:
     sa.Column('language', sa.Enum('english', 'russian', name='language'), nullable=False),
     sa.Column('notifications', sa.Boolean(), nullable=False),
     sa.Column('main_currency', sa.String(length=5), nullable=False),
-    sa.ForeignKeyConstraint(['id'], ['user.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['id'], ['user.id'], name=op.f('fk_settings_id_user'), ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_settings'))
     )
     op.create_table('movie_on_account',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -63,9 +63,9 @@ def upgrade() -> None:
     sa.Column('categories_name', sa.String(), nullable=False),
     sa.Column('earnings_type', sa.String(), nullable=False),
     sa.Column('time', sa.DateTime(), server_default=sa.text("TIMEZONE('utc', now())"), nullable=False),
-    sa.ForeignKeyConstraint(['cash_account'], ['cash_account.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['id'], ['user.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['cash_account'], ['cash_account.id'], name=op.f('fk_movie_on_account_cash_account_cash_account'), ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['id'], ['user.id'], name=op.f('fk_movie_on_account_id_user'), ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_movie_on_account'))
     )
     # ### end Alembic commands ###
 

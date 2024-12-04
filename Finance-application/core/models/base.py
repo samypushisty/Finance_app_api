@@ -1,9 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Annotated
-from sqlalchemy import ForeignKey, text, String
+from sqlalchemy import ForeignKey, text, String, MetaData
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
-
+from core.config import settings
 import enum
 
 str_5 = Annotated[str,5]
@@ -14,6 +14,9 @@ intpk = Annotated[int, mapped_column(primary_key=True)]
 
 
 class Base(DeclarativeBase):
+    metadata = MetaData(
+        naming_convention=settings.db.naming_convention
+    )
     type_annotation_map = {
         str_5: String(5),
         str_50: String(50),
