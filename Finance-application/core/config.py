@@ -10,8 +10,15 @@ class RunConfig(BaseModel):
     port: int = 8000
 
 
-class ApiPrefix(BaseModel):
+class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
+    auth: str = "/auth"
+
+
+class ApiPrefix(BaseModel):
+    prefix: str = "/api"
+    v1: ApiV1Prefix = ApiV1Prefix()
+
 
 class DatabaseConfig(BaseModel):
     url: PostgresDsn = ""
@@ -36,6 +43,7 @@ class Settings(BaseSettings):
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",
     )
+    secret_key: str
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig = DatabaseConfig()
