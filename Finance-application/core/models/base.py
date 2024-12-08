@@ -6,10 +6,11 @@ from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from core.config import settings
 import enum
 
-str_5 = Annotated[str,5]
-str_50 = Annotated[str,50]
+str_3 = Annotated[str,3]
+str_15 = Annotated[str,15]
 str_256 = Annotated[str,256]
-intfk = Annotated[int, mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)]
+intfk = Annotated[int, mapped_column(ForeignKey("user.chat_id", ondelete="CASCADE"))]
+intfkpk = Annotated[int, mapped_column(ForeignKey("user.chat_id", ondelete="CASCADE"), primary_key=True)]
 intpk = Annotated[int, mapped_column(primary_key=True)]
 
 
@@ -18,8 +19,8 @@ class Base(DeclarativeBase):
         naming_convention=settings.db.naming_convention
     )
     type_annotation_map = {
-        str_5: String(5),
-        str_50: String(50),
+        str_3: String(3),
+        str_15: String(15),
         str_256: String(256)
     }
 
@@ -41,55 +42,62 @@ class Theme(enum.Enum):
     white = "white"
     auto = "auto"
 
-# таблица с пользователями
+
 class User(Base):
     __tablename__ = "user"
 
-    id: Mapped[intpk]
+    chat_id: Mapped[intpk]
     currencies: Mapped[str]
-    categories: Mapped[Optional[str]]
     type_of_earnings: Mapped[Optional[str]]
 
 
-# таблица с едой
 class CashAccount(Base):
     __tablename__ = "cash_account"
 
-    id: Mapped[intpk]
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
+    cash_id: Mapped[intpk]
+    chat_id: Mapped[intfk]
     balance: Mapped[float]
-    name: Mapped[str_50]
+    name: Mapped[str_15]
+    description: Mapped[str_256]
     type: Mapped[CashAccountType]
-    currency: Mapped[str_5]
+    currency: Mapped[str_3]
+
+
+class Category(Base):
+    __tablename__ = "category"
+    chat_id: Mapped[intfkpk]
+    month_limit: Mapped[float]
+    name: Mapped[str_15]
 
 
 # таблица с сетами
 class Setings(Base):
     __tablename__ = "settings"
 
-    id: Mapped[intfk]
+    chat_id: Mapped[intfkpk]
     theme: Mapped[Theme]
     language: Mapped[Language]
     notifications: Mapped[bool]
-    main_currency: Mapped[str_5]
+    main_currency: Mapped[str_3]
 
 
 class MovieOnAccount(Base):
     __tablename__ = "movie_on_account"
 
-    id: Mapped[intfk]
-    title: Mapped[str_50]
+    movie_id: Mapped[intpk]
+    chat_id: Mapped[intfk]
+    title: Mapped[str_15]
     description: Mapped[Optional[str_256]]
     type: Mapped[MovieType]
     worth: Mapped[Decimal]
-    cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.id", ondelete="CASCADE"))
-    categories_name: Mapped[str]
-    earnings_type: Mapped[str]
+    cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.cash_id", ondelete="CASCADE"))
+    categories_name: Mapped[Optional[str]]
+    earnings_type: Mapped[Optional[str]]
     time: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
 
 
 class Balance(Base):
     __tablename__ = "balance"
-    id: Mapped[intfk]
+    chat_id: Mapped[intfkpk]
     total_balance: Mapped[float]
     balances_history: Mapped[str]
