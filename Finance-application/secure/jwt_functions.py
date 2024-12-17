@@ -1,11 +1,11 @@
 import jwt
+import time
 from core.config import settings
-from fastapi import Request
 from fastapi.exceptions import HTTPException
 
 
-def validation(request: Request):
-    jwt_info = JwtInfo(request.cookies.get("jwt"))
+def validation(token: str):
+    jwt_info = JwtInfo(token)
     if jwt_info.valid:
         return jwt_info
     else:
@@ -13,7 +13,7 @@ def validation(request: Request):
 
 
 def create_jwt(chat_id: int):
-    return jwt.encode(payload={'id': chat_id},
+    return jwt.encode(payload={'id': chat_id, "expires": time.time() + 3600},
                       key=settings.secret_key, algorithm='HS256')
 
 
@@ -22,12 +22,20 @@ class JwtInfo:
         self.valid = False
         try:
             data = jwt.decode(token, settings.secret_key, algorithms=["HS256"])
+            self._expires = data.get("expires")
             self.id = data.get("id")
-            self.valid =True
+            self._verify_jwt()
         except:
             self.id = None
             self.info_except = "invalid token or you haven't token"
 
-
+    def _verify_jwt(self):
+        if self._expires is None:
+            self.info_except = "data expire is none"
+        elif time.time() > self._expires:
+            self.info_except = "expired"
+        else:
+            self.valid = True
+            self.info_except = None
 
 

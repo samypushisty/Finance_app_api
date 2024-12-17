@@ -1,5 +1,5 @@
 from typing import AsyncGenerator
-
+import asyncio
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     AsyncEngine,
@@ -37,7 +37,9 @@ class DatabaseHelper:
 
     async def session_getter(self) -> AsyncGenerator[AsyncSession, None]:
         async with self.session_factory() as session:
+            print("open")
             yield session
+        print("close")
 
 
 db_helper = DatabaseHelper(

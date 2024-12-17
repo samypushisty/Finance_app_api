@@ -26,8 +26,8 @@ class Base(DeclarativeBase):
 
 
 class Language(enum.Enum):
-    english = "en"
-    russian = "ru"
+    english = "english"
+    russian = "russian"
 
 class CashAccountType(enum.Enum):
     cash = "cash"
@@ -71,7 +71,7 @@ class Category(Base):
 
 
 # таблица с сетами
-class Setings(Base):
+class Settings(Base):
     __tablename__ = "settings"
 
     chat_id: Mapped[intfkpk]
@@ -80,6 +80,8 @@ class Setings(Base):
     notifications: Mapped[bool]
     main_currency: Mapped[str_3]
 
+    class Config:
+        use_enum_values = True
 
 class MovieOnAccount(Base):
     __tablename__ = "movie_on_account"
