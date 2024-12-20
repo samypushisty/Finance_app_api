@@ -2,17 +2,17 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import db_helper
 from core.models.base import User, Settings
-from core.schemas.auth import UserAuth, UserRegistration
+from core.schemas.auth import UserAuth, UserRegistration, JWTRead
+from core.schemas.responces import GenericResponse
 from core.schemas.user_settings import UserSettingsRead
 from secure import create_jwt
-from fastapi.exceptions import HTTPException
 from sqlalchemy import select
 
 
 router = APIRouter(tags=["Auth"])
 
 
-@router.post("")
+@router.post("",response_model=GenericResponse[JWTRead])
 async def get_users(
         user: UserAuth,
         session: AsyncSession = Depends(db_helper.session_getter),
@@ -30,5 +30,5 @@ async def get_users(
         session.add(stmt)
         await session.commit()
     answer = create_jwt(user.chat_id)
-    return HTTPException(status_code=500, detail=answer)
+    return GenericResponse[JWTRead](detail=JWTRead(jwt=answer))
 

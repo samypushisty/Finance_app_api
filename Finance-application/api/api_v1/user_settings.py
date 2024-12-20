@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import db_helper
+from core.schemas.responces import GenericResponse
 from core.schemas.user_settings import UserSettingsPatch, UserSettingsRead
 from core.models.base import Settings
 from secure import JwtInfo
@@ -12,7 +13,7 @@ router = APIRouter(tags=["Settings"])
 
 
 @router.patch("")
-async def get_users(
+async def patch_settings(
         user_settings: UserSettingsPatch,
         token: JwtInfo = Depends(validation),
         session: AsyncSession = Depends(db_helper.session_getter),
@@ -25,13 +26,13 @@ async def get_users(
             setattr(user_settings_old, key, getattr(user_settings, key))
     await session.commit()
 
-@router.get("",response_model=UserSettingsRead)
-async def get_users(
+@router.get("",response_model=GenericResponse[UserSettingsRead])
+async def get_settings(
         jwt: str,
         session: AsyncSession = Depends(db_helper.session_getter),
         ):
     token = JwtInfo(jwt)
     query = select(Settings).where(Settings.chat_id == token.id)
     result = await session.execute(query)
-    result = result.scalars().first()
-    return result
+    result = UserSettingsRead.model_validate(result.scalars().first(),from_attributes=True)
+    return GenericResponse[UserSettingsRead](detail=result)
