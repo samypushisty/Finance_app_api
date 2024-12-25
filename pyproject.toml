@@ -13,6 +13,7 @@ asyncpg = "^0.29.0"
 psycopg2-binary = "^2.9.9"
 pyjwt = "^2.9.0" 
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
+dependency-injector = "^4.44.0"
 
 
 [build-system]
