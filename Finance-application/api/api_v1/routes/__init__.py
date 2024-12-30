@@ -3,5 +3,5 @@ __all__ = (
     "user_settings_router",
 )
 
-from .auth import router as auth_router
-from .user_settings import router as user_settings_router
+from api.api_v1.routes.auth import router as auth_router
+from api.api_v1.routes.user_settings import router as user_settings_router

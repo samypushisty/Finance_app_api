@@ -1,8 +1,11 @@
 from contextlib import asynccontextmanager
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
 from starlette.middleware.cors import CORSMiddleware
 from api import router as api_router
+from api.api_v1.services.base_schemas.schemas import StandartException
 from core.config import settings
 from core.models import db_helper
 
@@ -27,6 +30,13 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+
+@main_app.exception_handler(StandartException)
+async def unicorn_exception_handler(request: Request, exc: StandartException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=exc.detail
+    )
 
 main_app.add_middleware(
     CORSMiddleware,

@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Annotated
-from sqlalchemy import ForeignKey, text, String, MetaData
+from sqlalchemy import ForeignKey, text, String, MetaData, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from core.config import settings
 import enum
@@ -9,9 +9,9 @@ import enum
 str_3 = Annotated[str,3]
 str_15 = Annotated[str,15]
 str_256 = Annotated[str,256]
-intfk = Annotated[int, mapped_column(ForeignKey("user.chat_id", ondelete="CASCADE"))]
-intfkpk = Annotated[int, mapped_column(ForeignKey("user.chat_id", ondelete="CASCADE"), primary_key=True)]
-intpk = Annotated[int, mapped_column(primary_key=True)]
+intfk = Annotated[int, mapped_column(BigInteger, ForeignKey("user.chat_id", ondelete="CASCADE"))]
+intfkpk = Annotated[int, mapped_column(BigInteger, ForeignKey("user.chat_id", ondelete="CASCADE"), primary_key=True)]
+intpk = Annotated[int, mapped_column(BigInteger, primary_key=True)]
 
 
 class Base(DeclarativeBase):

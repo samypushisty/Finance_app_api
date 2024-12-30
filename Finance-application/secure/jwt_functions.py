@@ -1,7 +1,12 @@
 import jwt
 import time
+
+from api.api_v1.services.base_schemas.schemas import StandartException
 from core.config import settings
-from fastapi.exceptions import HTTPException
+
+
+
+
 
 
 def validation(token: str):
@@ -9,7 +14,7 @@ def validation(token: str):
     if jwt_info.valid:
         return jwt_info
     else:
-        raise HTTPException(status_code=500, detail=jwt_info.info_except)
+        raise StandartException(status_code=401, detail=jwt_info.info_except)
 
 
 def create_jwt(chat_id: int):

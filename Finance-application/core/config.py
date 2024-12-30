@@ -23,6 +23,7 @@ class ApiPrefix(BaseModel):
 
 class DatabaseConfig(BaseModel):
     url: PostgresDsn = ""
+    sync_url: PostgresDsn = ""
     echo: bool = False
     echo_pool: bool = False
     pool_size: int = 50
