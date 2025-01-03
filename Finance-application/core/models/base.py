@@ -65,7 +65,7 @@ class CashAccount(Base):
 
 class Category(Base):
     __tablename__ = "category"
-    movie_id: Mapped[intpk]
+    category_id: Mapped[intpk]
     chat_id: Mapped[intfk]
     month_limit: Mapped[float]
     name: Mapped[str_15]
