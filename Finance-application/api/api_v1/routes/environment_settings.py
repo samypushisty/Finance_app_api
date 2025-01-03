@@ -12,7 +12,7 @@ router = APIRouter(tags=["EnvironmentSettings"])
 async def get_user_categories_service() -> UserCategoriesServiceI:
     return container.user_categories_service()
 
-@router.post("/category")
+@router.post("")
 async def post_category(
         user_category: UserCategoryPost,
         token: JwtInfo = Depends(validation),
@@ -21,7 +21,7 @@ async def post_category(
     await user_category_service.post_user_category(user_category=user_category,token=token)
 
 
-@router.patch("/category")
+@router.patch("")
 async def patch_category(
         user_category: UserCategoryPatch,
         token: JwtInfo = Depends(validation),
@@ -29,7 +29,7 @@ async def patch_category(
         ):
     await user_category_service.patch_user_category(user_category=user_category,token=token)
 
-@router.get("/category/all",response_model=GenericResponse[UserCategoriesRead])
+@router.get("/all",response_model=GenericResponse[UserCategoriesRead])
 async def get_categories(
         token: JwtInfo = Depends(validation),
         user_category_service = Depends(get_user_categories_service),
@@ -37,7 +37,7 @@ async def get_categories(
     return await user_category_service.get_user_categories(token=token)
 
 
-@router.get("/category",response_model=GenericResponse[UserCategoryRead])
+@router.get("",response_model=GenericResponse[UserCategoryRead])
 async def get_category(
         user_category: UserCategoryGet = Depends(),
         token: JwtInfo = Depends(validation),
@@ -45,9 +45,9 @@ async def get_category(
         ):
     return await user_category_service.get_user_category(user_category=user_category, token=token)
 
-@router.delete("/category")
+@router.delete("")
 async def delete_category(
-        user_category: UserCategoryGet,
+        user_category: UserCategoryGet = Depends(),
         token: JwtInfo = Depends(validation),
         user_category_service = Depends(get_user_categories_service),
         ):

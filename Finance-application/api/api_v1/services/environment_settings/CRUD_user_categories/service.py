@@ -41,7 +41,7 @@ class UserCategoriesService(UserCategoriesServiceI):
     async def get_user_categories(self, token: JwtInfo) -> GenericResponse[UserCategoriesRead]:
 
         async with self.session() as session:
-            query = select(Category).where(Category.chat_id == token.id)
+            query = select(Category).filter(Category.chat_id == token.id).order_by(Category.category_id)
             result = await session.execute(query)
             result = result.scalars().all()
             if not result:
