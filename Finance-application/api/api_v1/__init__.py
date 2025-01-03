@@ -2,8 +2,8 @@ from fastapi import APIRouter
 
 from core.config import settings
 
-from api.api_v1.routes import auth_router
-from api.api_v1.routes import user_settings_router
+from api.api_v1.routes import auth_router, user_categories_router,user_settings_router
+
 
 router = APIRouter(
     prefix=settings.api.v1.prefix,
@@ -16,4 +16,9 @@ router.include_router(
 router.include_router(
     user_settings_router,
     prefix=settings.api.v1.settings,
+)
+
+router.include_router(
+    user_categories_router,
+    prefix=settings.api.v1.categories,
 )

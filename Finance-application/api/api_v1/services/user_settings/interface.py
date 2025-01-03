@@ -10,5 +10,6 @@ class UserSettingsServiceI(Protocol):
     async def patch_settings(self, user_settings: UserSettingsPatch, token: JwtInfo) -> None:
         ...
 
+    @abstractmethod
     async def get_settings(self, token: JwtInfo) -> GenericResponse[UserSettingsRead]:
         ...

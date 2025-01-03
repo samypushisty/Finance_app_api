@@ -1,8 +1,8 @@
 """drop Category
 
-Revision ID: 0b674650d5f2
+Revision ID: 4bd38631b4c0
 Revises: 37224f72d3bb
-Create Date: 2025-01-03 15:38:48.819352
+Create Date: 2025-01-03 18:11:21.062594
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0b674650d5f2'
+revision: str = '4bd38631b4c0'
 down_revision: Union[str, None] = '37224f72d3bb'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

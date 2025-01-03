@@ -6,7 +6,7 @@ from api.api_v1.services.user_settings.schemas import UserSettingsPatch, UserSet
 from secure import JwtInfo
 from secure.jwt_functions import validation
 
-router = APIRouter(tags=["Settings"])
+router = APIRouter(tags=["UserSettings"])
 
 async def get_user_settings_service() -> UserSettingsServiceI:
     return container.user_settings_service()
