@@ -11,7 +11,7 @@ str_15 = Annotated[str,15]
 str_256 = Annotated[str,256]
 intfk = Annotated[int, mapped_column(BigInteger, ForeignKey("user.chat_id", ondelete="CASCADE"))]
 intfkpk = Annotated[int, mapped_column(BigInteger, ForeignKey("user.chat_id", ondelete="CASCADE"), primary_key=True)]
-intpk = Annotated[int, mapped_column(BigInteger, primary_key=True)]
+intpk = Annotated[int, mapped_column( primary_key=True, autoincrement=True)]
 
 
 class Base(DeclarativeBase):
@@ -46,7 +46,7 @@ class Theme(enum.Enum):
 class User(Base):
     __tablename__ = "user"
 
-    chat_id: Mapped[intpk]
+    chat_id: Mapped[int] = mapped_column( BigInteger, primary_key=True, autoincrement=False)
     currencies: Mapped[str]
     type_of_earnings: Mapped[Optional[str]]
 
@@ -65,7 +65,8 @@ class CashAccount(Base):
 
 class Category(Base):
     __tablename__ = "category"
-    chat_id: Mapped[intfkpk]
+    movie_id: Mapped[intpk]
+    chat_id: Mapped[intfk]
     month_limit: Mapped[float]
     name: Mapped[str_15]
 
