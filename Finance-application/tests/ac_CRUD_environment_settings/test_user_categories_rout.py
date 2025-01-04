@@ -8,13 +8,13 @@ from tests.schemas import DataDTO, DataForFixture
 data_test = DataForTestUserEnvironment()
 
 @pytest.mark.parametrize("data_for_test",
-                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.data_param)),
-                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.data_param)),
-                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.data_param)),
-                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.data_param)),
-                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.data_param)),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.wrong_data_param)),
-                          DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.data_param))],
+                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
+                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
+                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
+                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
+                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.wrong_limit)),
+                          DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.input))],
                          indirect=True, scope="function", ids=idfn)
 def test_post_user_category_post(client,data_for_test):
     response = client.post("/api/v1/category",json=data_for_test.data.data, params={"token": data_for_test.token})
@@ -37,16 +37,17 @@ def test_settings_get_all(client,data_for_test):
     print(time.time())
     assert response.status_code ==data_for_test.data.status_code
     if response.status_code == 200:
-        data = data_test.data_param_for_test
+        data = data_test.for_test
         for i in range(5):
             data["category_id"] = i+1
             assert answer["detail"]["categories"][i] == data
 
 @pytest.mark.parametrize("data_for_test",
-                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.new_data_param_2)),
-                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.new_data_param_4)),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.new_wrong_data_param)),
-                          DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.new_wrong_data_param))],
+                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.new_id_2)),
+                          DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.new_id_4)),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.new_wrong_limit)),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=404,data=data_test.new_wrong_id)),
+                          DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.new_wrong_limit))],
                          indirect=True, scope="function", ids=idfn)
 def test_user_category_patch(client,data_for_test):
     response = client.patch("/api/v1/category",json=data_for_test.data.data, params={"token": data_for_test.token})
@@ -82,7 +83,7 @@ def test_user_category_get(client,data_for_test):
     print(time.time())
     assert response.status_code == data_for_test.data.status_code
     if response.status_code == 200:
-        data = data_test.data_param_for_test
+        data = data_test.for_test
         data["category_id"] = 3
         assert answer["detail"] == data
 
@@ -101,8 +102,8 @@ def test_settings_get_all_patch(client,data_for_test):
     if response.status_code == 200:
         for i in range(4):
             if i % 2:
-                data = data_test.data_param_for_test
+                data = data_test.for_test
             else:
-                data = data_test.data_param_for_test_patch
+                data = data_test.for_test_patch
             data["category_id"] = i+2
             assert answer["detail"]["categories"][i] == data

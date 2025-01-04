@@ -5,7 +5,7 @@ from core.models.base import Settings
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
 from api.api_v1.services.user_settings.schemas import UserSettingsRead, UserSettingsPatch
 from secure import JwtInfo
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 
 class UserSettingsService(UserSettingsServiceI):
@@ -16,19 +16,24 @@ class UserSettingsService(UserSettingsServiceI):
         token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                query = select(Settings).filter(Settings.chat_id == token.id)
-                user_settings_old = await session.execute(query)
-                user_settings_old = user_settings_old.scalars().first()
-                if not user_settings_old:
+                stmt = (
+                    update(Settings)
+                    .values(**user_settings.model_dump())
+                    .filter(Settings.chat_id == token.id)
+                )
+                result = await session.execute(stmt)
+                if result.rowcount == 0:
+                    await session.rollback()
                     raise StandartException(status_code=404, detail="user not found")
-                for key in user_settings.model_dump().keys():
-                    if not getattr(user_settings, key) == getattr(user_settings_old, key):
-                        setattr(user_settings_old, key, getattr(user_settings, key))
                 await session.commit()
+
 
     async def get_settings(self, token: JwtInfo) -> GenericResponse[UserSettingsRead]:
         async with self.session() as session:
-            query = select(Settings).where(Settings.chat_id == token.id)
+            query = (
+                select(Settings)
+                .where(Settings.chat_id == token.id)
+            )
             result = await session.execute(query)
             result = result.scalars().first()
             if not result:

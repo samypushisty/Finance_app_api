@@ -7,7 +7,7 @@ from api.api_v1.services.environment_settings.CRUD_user_categories.schemas impor
 from core.models.base import Category
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
 from secure import JwtInfo
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 
 class UserCategoriesService(UserCategoriesServiceI):
@@ -26,22 +26,27 @@ class UserCategoriesService(UserCategoriesServiceI):
     async def patch_user_category(self, user_category: UserCategoryPatch, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                query = select(Category).filter(Category.chat_id == token.id).filter(
-                    Category.category_id == user_category.category_id)
-                category_id_old = await session.execute(query)
-                category_id_old = category_id_old.scalars().first()
-                if not category_id_old:
-                    raise StandartException(status_code=404, detail="category not found")
-                for key in user_category.model_dump().keys():
-                    if not getattr(user_category, key) == getattr(category_id_old, key):
-                        setattr(category_id_old, key, getattr(user_category, key))
+                stmt = (
+                    update(Category)
+                    .values(**user_category.model_dump())
+                    .filter(Category.chat_id == token.id)
+                    .filter(Category.category_id == user_category.category_id)
+                )
+                result = await session.execute(stmt)
+                if result.rowcount == 0:
+                    await session.rollback()
+                    raise StandartException(status_code=404, detail="user or category not found")
                 await session.commit()
 
 
     async def get_user_categories(self, token: JwtInfo) -> GenericResponse[UserCategoriesRead]:
 
         async with self.session() as session:
-            query = select(Category).filter(Category.chat_id == token.id).order_by(Category.category_id)
+            query = (
+                select(Category)
+                .filter(Category.chat_id == token.id)
+                .order_by(Category.category_id)
+            )
             result = await session.execute(query)
             result = result.scalars().all()
             if not result:
@@ -55,8 +60,11 @@ class UserCategoriesService(UserCategoriesServiceI):
     async def get_user_category(self,user_category: UserCategoryGet, token: JwtInfo) -> GenericResponse[UserCategoryRead]:
 
         async with self.session() as session:
-            query = select(Category).filter(Category.chat_id == token.id).filter(
-                Category.category_id == user_category.category_id)
+            query = (
+                select(Category)
+                .filter(Category.chat_id == token.id)
+                .filter(Category.category_id == user_category.category_id)
+            )
             result = await session.execute(query)
             result = result.scalars().first()
             if not result:
@@ -66,8 +74,11 @@ class UserCategoriesService(UserCategoriesServiceI):
 
     async def delete_user_category(self,user_category: UserCategoryGet, token: JwtInfo) -> None:
         async with self.session() as session:
-            query = select(Category).filter(Category.chat_id == token.id).filter(
-                Category.category_id == user_category.category_id)
+            query = (
+                select(Category)
+                .filter(Category.chat_id == token.id)
+                .filter(Category.category_id == user_category.category_id)
+            )
             result = await session.execute(query)
             result = result.scalars().first()
             if not result:

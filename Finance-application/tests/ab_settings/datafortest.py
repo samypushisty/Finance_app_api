@@ -1,20 +1,20 @@
 class DataForTestSettings:
     def __init__(self):
-        self.new_data_param = {
+        self.new = {
             "theme": "white",
             "language": "russian",
             "notifications": False,
             "main_currency": "byn"
         }
 
-        self.new_wrong_data_param = {
+        self.new_wrong = {
             "theme": "white",
             "language": "rus",
             "notifications": False,
             "main_currency": "byn"
         }
 
-        self.old_data_param = {
+        self.old = {
             "theme": "auto",
             "language": "english",
             "notifications": True,
