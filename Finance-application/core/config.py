@@ -14,7 +14,7 @@ class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
     auth: str = "/auth"
     settings: str = "/settings"
-    categories: str = "/category"
+    environment_settings: str = "/environment_settings"
 
 
 class ApiPrefix(BaseModel):

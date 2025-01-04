@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends
 from api.api_v1.services.environment_settings.CRUD_user_categories import UserCategoriesServiceI
 from api.api_v1.container import container
 from api.api_v1.services.base_schemas.schemas import GenericResponse
@@ -7,7 +7,7 @@ from api.api_v1.services.environment_settings.CRUD_user_categories.schemas impor
 from secure import JwtInfo
 from secure.jwt_functions import validation
 
-router = APIRouter(tags=["EnvironmentSettings"])
+router = APIRouter(prefix="/category", tags=["EnvironmentSettings"])
 
 async def get_user_categories_service() -> UserCategoriesServiceI:
     return container.user_categories_service()

@@ -2,6 +2,7 @@ from dependency_injector import containers
 from dependency_injector.providers import Singleton, Factory, Resource
 from api.api_v1.services.user_settings.interface import UserSettingsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_categories import UserCategoriesServiceI, UserCategoriesService
+from api.api_v1.services.environment_settings.CRUD_user_cash_accounts import UserCashAccountsService,UserCashAccountsServiceI
 from api.api_v1.services.user_settings.service import UserSettingsService
 from core.config import settings
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,6 +27,6 @@ class DependencyContainer(containers.DeclarativeContainer):
     auth_service: Factory["AuthServiceI"] = Factory(AuthService, session=database_session)
     user_settings_service: Factory["UserSettingsServiceI"] = Factory(UserSettingsService, session=database_session)
     user_categories_service: Factory["UserCategoriesServiceI"] = Factory(UserCategoriesService, session=database_session)
-
+    user_cash_accounts_service: Factory["UserCashAccountsServiceI"] = Factory(UserCashAccountsService,session=database_session)
 
 container = DependencyContainer()

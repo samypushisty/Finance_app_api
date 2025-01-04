@@ -7,7 +7,7 @@ from api.api_v1.services.environment_settings.CRUD_user_categories.schemas impor
 from core.models.base import Category
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
 from secure import JwtInfo
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 
 
 class UserCategoriesService(UserCategoriesServiceI):
@@ -75,13 +75,12 @@ class UserCategoriesService(UserCategoriesServiceI):
     async def delete_user_category(self,user_category: UserCategoryGet, token: JwtInfo) -> None:
         async with self.session() as session:
             query = (
-                select(Category)
+                delete(Category)
                 .filter(Category.chat_id == token.id)
                 .filter(Category.category_id == user_category.category_id)
             )
             result = await session.execute(query)
-            result = result.scalars().first()
-            if not result:
+            if result.rowcount == 0:
+                await session.rollback()
                 raise StandartException(status_code=404,detail="category not found")
-            await session.delete(result)
             await session.commit()
