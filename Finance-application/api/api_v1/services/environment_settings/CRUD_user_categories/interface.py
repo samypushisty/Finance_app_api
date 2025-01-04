@@ -7,11 +7,11 @@ from api.api_v1.services.base_schemas.schemas import GenericResponse
 
 class UserCategoriesServiceI(Protocol):
     @abstractmethod
-    async def post_user_category(self, user_categories: UserCategoryPost, token: JwtInfo) -> None:
+    async def post_user_category(self, user_category: UserCategoryPost, token: JwtInfo) -> None:
         ...
 
     @abstractmethod
-    async def patch_user_category(self, user_categories: UserCategoryPatch, token: JwtInfo) -> None:
+    async def patch_user_category(self, user_category: UserCategoryPatch, token: JwtInfo) -> None:
         ...
 
     @abstractmethod
