@@ -17,7 +17,7 @@ data_test = DataForTestUserEnvironment()
                           DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.input))],
                          indirect=True, scope="function", ids=idfn)
 def test_post_user_category_post(client,data_for_test):
-    response = client.post("/api/v1/category",json=data_for_test.data.data, params={"token": data_for_test.token})
+    response = client.post("/api/v1/environment_settings/category",json=data_for_test.data.data, params={"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -30,7 +30,7 @@ def test_post_user_category_post(client,data_for_test):
                           DataForFixture(id="www",data=DataDTO(status_code=401))],
                          indirect=True, scope="function", ids=idfn)
 def test_settings_get_all(client,data_for_test):
-    response = client.get("/api/v1/category/all", params={"token": data_for_test.token})
+    response = client.get("/api/v1/environment_settings/category/all", params={"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -50,7 +50,7 @@ def test_settings_get_all(client,data_for_test):
                           DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.new_wrong_limit))],
                          indirect=True, scope="function", ids=idfn)
 def test_user_category_patch(client,data_for_test):
-    response = client.patch("/api/v1/category",json=data_for_test.data.data, params={"token": data_for_test.token})
+    response = client.patch("/api/v1/environment_settings/category",json=data_for_test.data.data, params={"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -63,7 +63,7 @@ def test_user_category_patch(client,data_for_test):
                           DataForFixture(id="www",data=DataDTO(status_code=401,data={"category_id": 1}))],
                          indirect=True, scope="function", ids=idfn)
 def test_user_category_delete(client,data_for_test):
-    response = client.delete("/api/v1/category", params={"token": data_for_test.token, "category_id": data_for_test.data.data["category_id"]})
+    response = client.delete("/api/v1/environment_settings/category", params={"token": data_for_test.token, "category_id": data_for_test.data.data["category_id"]})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -76,7 +76,7 @@ def test_user_category_delete(client,data_for_test):
                           DataForFixture(id="www",data=DataDTO(status_code=401,data={"category_id": 3}))],
                          indirect=True, scope="function", ids=idfn)
 def test_user_category_get(client,data_for_test):
-    response = client.get("/api/v1/category", params={"token": data_for_test.token, "category_id": data_for_test.data.data["category_id"]})
+    response = client.get("/api/v1/environment_settings/category", params={"token": data_for_test.token, "category_id": data_for_test.data.data["category_id"]})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -93,7 +93,7 @@ def test_user_category_get(client,data_for_test):
                           DataForFixture(id="www",data=DataDTO(status_code=401))],
                          indirect=True, scope="function", ids=idfn)
 def test_settings_get_all_patch(client,data_for_test):
-    response = client.get("/api/v1/category/all", params={"token": data_for_test.token})
+    response = client.get("/api/v1/environment_settings/category/all", params={"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
