@@ -2,10 +2,10 @@ import time
 import pytest
 import json
 
-from tests.ac_CRUD_environment_settings.datafortest import DataForTestUserCategories
+from tests.ac_CRUD_environment_settings.datafortest import DataForTestCashAccounts
 from tests.conftest import idfn
 from tests.schemas import DataDTO, DataForFixture
-data_test = DataForTestUserCategories()
+data_test = DataForTestCashAccounts()
 
 @pytest.mark.parametrize("data_for_test",
                          [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
@@ -13,11 +13,12 @@ data_test = DataForTestUserCategories()
                           DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
                           DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
                           DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.wrong_limit)),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.wrong_balance)),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.wrong_description)),
                           DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.input))],
                          indirect=True, scope="function", ids=idfn)
 def test_post(client,data_for_test):
-    response = client.post("/api/v1/environment_settings/category",json=data_for_test.data.data, params={"token": data_for_test.token})
+    response = client.post("/api/v1/environment_settings/cash_accounts",json=data_for_test.data.data, params={"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -30,7 +31,7 @@ def test_post(client,data_for_test):
                           DataForFixture(id="www",data=DataDTO(status_code=401))],
                          indirect=True, scope="function", ids=idfn)
 def test_get_all(client,data_for_test):
-    response = client.get("/api/v1/environment_settings/category/all", params={"token": data_for_test.token})
+    response = client.get("/api/v1/environment_settings/cash_accounts/all", params={"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -39,18 +40,18 @@ def test_get_all(client,data_for_test):
     if response.status_code == 200:
         data = data_test.for_test
         for i in range(5):
-            data["category_id"] = i+1
-            assert answer["detail"]["categories"][i] == data
+            data["cash_id"] = i+1
+            assert answer["detail"]["accounts"][i] == data
 
 @pytest.mark.parametrize("data_for_test",
                          [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.new_id_2)),
                           DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.new_id_4)),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.new_wrong_limit)),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.new_wrong_balance)),
                           DataForFixture(id=1234567897,data=DataDTO(status_code=404,data=data_test.new_wrong_id)),
-                          DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.new_wrong_limit))],
+                          DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.new_wrong_balance))],
                          indirect=True, scope="function", ids=idfn)
 def test_patch(client,data_for_test):
-    response = client.patch("/api/v1/environment_settings/category",json=data_for_test.data.data, params={"token": data_for_test.token})
+    response = client.patch("/api/v1/environment_settings/cash_accounts",json=data_for_test.data.data, params={"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -58,12 +59,12 @@ def test_patch(client,data_for_test):
     assert response.status_code == data_for_test.data.status_code
 
 @pytest.mark.parametrize("data_for_test",
-                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data={"category_id": 1})),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=404,data={"category_id": 1})),
-                          DataForFixture(id="www",data=DataDTO(status_code=401,data={"category_id": 1}))],
+                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data={"cash_id": 1})),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=404,data={"cash_id": 1})),
+                          DataForFixture(id="www",data=DataDTO(status_code=401,data={"cash_id": 1}))],
                          indirect=True, scope="function", ids=idfn)
 def test_delete(client,data_for_test):
-    response = client.delete("/api/v1/environment_settings/category", params={"token": data_for_test.token, "category_id": data_for_test.data.data["category_id"]})
+    response = client.delete("/api/v1/environment_settings/cash_accounts", params={"token": data_for_test.token, "cash_id": data_for_test.data.data["cash_id"]})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -71,12 +72,12 @@ def test_delete(client,data_for_test):
     assert response.status_code == data_for_test.data.status_code
 
 @pytest.mark.parametrize("data_for_test",
-                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data={"category_id": 3})),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=404,data={"category_id": 3})),
-                          DataForFixture(id="www",data=DataDTO(status_code=401,data={"category_id": 3}))],
+                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data={"cash_id": 3})),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=404,data={"cash_id": 3})),
+                          DataForFixture(id="www",data=DataDTO(status_code=401,data={"cash_id": 3}))],
                          indirect=True, scope="function", ids=idfn)
 def test_get(client,data_for_test):
-    response = client.get("/api/v1/environment_settings/category", params={"token": data_for_test.token, "category_id": data_for_test.data.data["category_id"]})
+    response = client.get("/api/v1/environment_settings/cash_accounts", params={"token": data_for_test.token, "cash_id": data_for_test.data.data["cash_id"]})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -84,7 +85,7 @@ def test_get(client,data_for_test):
     assert response.status_code == data_for_test.data.status_code
     if response.status_code == 200:
         data = data_test.for_test
-        data["category_id"] = 3
+        data["cash_id"] = 3
         assert answer["detail"] == data
 
 @pytest.mark.parametrize("data_for_test",
@@ -93,7 +94,7 @@ def test_get(client,data_for_test):
                           DataForFixture(id="www",data=DataDTO(status_code=401))],
                          indirect=True, scope="function", ids=idfn)
 def test_get_all_patch(client,data_for_test):
-    response = client.get("/api/v1/environment_settings/category/all", params={"token": data_for_test.token})
+    response = client.get("/api/v1/environment_settings/cash_accounts/all", params={"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -105,5 +106,5 @@ def test_get_all_patch(client,data_for_test):
                 data = data_test.for_test
             else:
                 data = data_test.for_test_patch
-            data["category_id"] = i+2
-            assert answer["detail"]["categories"][i] == data
+            data["cash_id"] = i+2
+            assert answer["detail"]["accounts"][i] == data
