@@ -125,6 +125,7 @@ celerybeat.pid
 .env
 .test_env
 .venv
+redis.conf
 env/
 venv/
 ENV/

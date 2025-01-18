@@ -9,6 +9,10 @@ class RunConfig(BaseModel):
     host: str = '0.0.0.0'
     port: int = 8000
 
+class RedisConfig(BaseModel):
+    REDIS_PORT: int = 6379
+    REDIS_PASSWORD: str = ""
+    REDIS_HOST: str = "0.0.0.0"
 
 class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
@@ -50,5 +54,7 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig = DatabaseConfig()
+    db_redis: RedisConfig =RedisConfig()
 
 settings = Settings()
+
