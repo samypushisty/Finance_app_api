@@ -3,7 +3,7 @@ from celery import Celery
 from celery_app.config import  settings
 from datetime import timedelta
 
-from core.redis_db.redis_helper import redis_url
+from core.redis_db.redis_helper import redis_url, redis_client
 
 celery_app = Celery(
     "celery_worker",  # Имя приложения Celery
@@ -12,20 +12,21 @@ celery_app = Celery(
 )
 
 @celery_app.task(
-    name='get_jwt',
+    name='update_prices',
 )
-def get_jwt(user_id):
+def update_prices():
     try:
-        response = requests.post(f"{settings.BASE_URL}/api/v1/auth", json={"chat_id":user_id})
-        response.raise_for_status()
-        return response.text
+        response = requests.get(f"https://v6.exchangerate-api.com/v6/{settings.API_key}/latest/USD")
+        response = response.json()["conversion_rates"]
+        for k,v in response.items():
+            redis_client.set(k, v)
+        return "Success"
     except Exception as e:
         return e
 
 celery_app.conf.beat_schedule = {
-    "get_jwt": {
-        "task": 'get_jwt',
-        "schedule": timedelta(seconds=30),
-        "args": (999999999,)
+    "update_prices": {
+        "task": 'update_prices',
+        "schedule": timedelta(seconds=30)
     },
 }
