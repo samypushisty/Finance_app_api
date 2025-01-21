@@ -127,3 +127,14 @@ class DataForTestCashAccounts:
             "type": "card",
             "currency": "byn"
         }
+
+
+class DataForTestCurrencies:
+    def __init__(self):
+        self.input = {
+            "name": "JPY",
+        }
+
+        self.wrong_currency = {
+            "name": "string",
+        }
