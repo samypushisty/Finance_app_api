@@ -3,6 +3,7 @@ import time
 import pytest
 import json
 
+from secure.jwt_functions import validation
 from tests.ab_settings.datafortest import DataForTestSettings
 from tests.conftest import idfn
 from tests.schemas import DataDTO, DataForFixture
@@ -34,7 +35,11 @@ def test_settings_get(client,data_for_test):
     print(answer)
     print(data_for_test.data.status_code)
     print(time.time())
-    assert response.status_code ==data_for_test.data.status_code
+    assert response.status_code == data_for_test.data.status_code
+    if response.status_code == 200:
+        data = data_for_test.data.data
+        data["chat_id"] = validation(data_for_test.token).id
+        assert answer["detail"] == data_for_test.data.data
 
 
 
