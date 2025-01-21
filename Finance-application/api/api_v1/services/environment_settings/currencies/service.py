@@ -19,8 +19,7 @@ class UserCurrenciesService(UserCurrenciesServiceI):
 
     async def get_currency_price(self, name_currency: CurrencyGet) -> GenericResponse[CurrencyRead]:
         async with self.db_redis() as session:
-            price  = await session.get(name_currency.name)
-            print(price)
+            price  = float(await session.get(name_currency.name))
         if not price:
             raise StandartException(status_code=404, detail="currency not found")
         result_currency = CurrencyRead(name=name_currency.name,price=price)
