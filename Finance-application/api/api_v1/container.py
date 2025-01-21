@@ -1,5 +1,6 @@
 from dependency_injector import containers
 from dependency_injector.providers import Singleton, Factory, Resource
+from api.api_v1.services.environment_settings.currencies.service import UserCurrenciesService, UserCurrenciesServiceI
 from api.api_v1.services.user_settings.interface import UserSettingsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_categories import UserCategoriesServiceI, UserCategoriesService
 from api.api_v1.services.environment_settings.CRUD_user_cash_accounts import UserCashAccountsService,UserCashAccountsServiceI
@@ -12,7 +13,7 @@ from api.api_v1.services.auth.interface import AuthServiceI
 from api.api_v1.services.auth.service import AuthService
 from core.models.base import Category, CashAccount, Settings, User
 from core.models.db_helper import DatabaseHelper
-
+from core.redis_db.redis_helper import redis_session_getter
 
 class DependencyContainer(containers.DeclarativeContainer):
 
@@ -47,8 +48,13 @@ class DependencyContainer(containers.DeclarativeContainer):
     )
 
     auth_service: Factory["AuthServiceI"] = Factory(AuthService, repository_user=user_repository, repository_settings=settings_repository)
-    user_settings_service: Factory["UserSettingsServiceI"] = Factory(UserSettingsService, repository=settings_repository)
-    user_categories_service: Factory["UserCategoriesServiceI"] = Factory(UserCategoriesService, repository=categories_repository)
-    user_cash_accounts_service: Factory["UserCashAccountsServiceI"] = Factory(UserCashAccountsService, repository=cash_account_repository)
+    user_settings_service: Factory["UserSettingsServiceI"] = Factory(UserSettingsService,
+                                                                     repository=settings_repository)
+    user_categories_service: Factory["UserCategoriesServiceI"] = Factory(UserCategoriesService,
+                                                                         repository=categories_repository)
+    user_cash_accounts_service: Factory["UserCashAccountsServiceI"] = Factory(UserCashAccountsService,
+                                                                              repository=cash_account_repository)
+    user_currency_service: Factory["UserCurrenciesServiceI"] = Factory(UserCurrenciesService,
+                                                                              db_redis=redis_session_getter)
 
 container = DependencyContainer()
