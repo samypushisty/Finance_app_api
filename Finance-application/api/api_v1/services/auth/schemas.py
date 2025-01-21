@@ -8,4 +8,3 @@ class JWTRead(BaseModel):
 
 class UserRegistration(BaseModel):
     chat_id: int = Field(ge=10000000, le=10000000000)
-    type_of_earnings: str

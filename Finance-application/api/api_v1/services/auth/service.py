@@ -15,7 +15,7 @@ class AuthService(AuthServiceI):
     async def get_user(self, user: UserAuth) -> GenericResponse[JWTRead]:
         result = await self.repository_user.find(chat_id=user.chat_id)
         if not result:
-            user_registration = UserRegistration(chat_id=user.chat_id, type_of_earnings="_")
+            user_registration = UserRegistration(chat_id=user.chat_id)
             user_settings = UserSettingsRead(chat_id=user.chat_id, theme="auto", language="english",
                                                      notifications=True, main_currency="usd")
             await self.repository_user.add(user_registration.model_dump())

@@ -49,7 +49,6 @@ class User(Base):
     chat_id: Mapped[int] = mapped_column( BigInteger, primary_key=True, autoincrement=False)
     registration: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
     last_visit: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
-    type_of_earnings: Mapped[Optional[str]]
 
 
 class CashAccount(Base):
@@ -71,6 +70,12 @@ class Category(Base):
     month_limit: Mapped[float]
     name: Mapped[str_15]
 
+class Earnings(Base):
+    __tablename__ = "earnings"
+    chat_id: Mapped[intfk]
+    earning_id: Mapped[intpk]
+    name: Mapped[str_15]
+    description: Mapped[str_256]
 
 # таблица с сетами
 class Settings(Base):
@@ -95,8 +100,8 @@ class MovieOnAccount(Base):
     type: Mapped[MovieType]
     worth: Mapped[Decimal]
     cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.cash_id", ondelete="CASCADE"))
-    categories_name: Mapped[Optional[str]]
-    earnings_type: Mapped[Optional[str]]
+    categories_id: Mapped[Optional[int]]
+    earnings_id: Mapped[Optional[int]]
     time: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
 
 
