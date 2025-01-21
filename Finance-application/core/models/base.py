@@ -47,7 +47,8 @@ class User(Base):
     __tablename__ = "user"
 
     chat_id: Mapped[int] = mapped_column( BigInteger, primary_key=True, autoincrement=False)
-    currencies: Mapped[str]
+    registration: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
+    last_visit: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
     type_of_earnings: Mapped[Optional[str]]
 
 
