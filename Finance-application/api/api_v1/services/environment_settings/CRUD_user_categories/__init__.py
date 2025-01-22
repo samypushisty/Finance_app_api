@@ -1,6 +1,6 @@
 __all__ = (
     "UserCategoriesService"
-    "serCategoriesServiceI"
+    "UserCategoriesServiceI"
 )
 
 from .service import UserCategoriesService

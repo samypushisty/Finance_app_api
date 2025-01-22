@@ -1,5 +1,7 @@
 from dependency_injector import containers
 from dependency_injector.providers import Singleton, Factory, Resource
+
+from api.api_v1.services.environment_settings.CRUD_user_earnings.service import UserEarningsService, UserEarningsServiceI
 from api.api_v1.services.environment_settings.currencies.service import UserCurrenciesService, UserCurrenciesServiceI
 from api.api_v1.services.user_settings.interface import UserSettingsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_categories import UserCategoriesServiceI, UserCategoriesService
@@ -11,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from collections.abc import AsyncGenerator
 from api.api_v1.services.auth.interface import AuthServiceI
 from api.api_v1.services.auth.service import AuthService
-from core.models.base import Category, CashAccount, Settings, User
+from core.models.base import Category, CashAccount, Settings, User, Earnings
 from core.models.db_helper import DatabaseHelper
 from core.redis_db.redis_helper import redis_session_getter
 
@@ -46,6 +48,11 @@ class DependencyContainer(containers.DeclarativeContainer):
         session = database_session,
         model = User,
     )
+    type_of_earnings_repository: Singleton["SQLAlchemyRepository"] = Singleton(
+        SQLAlchemyRepository,
+        session=database_session,
+        model=Earnings,
+    )
 
     auth_service: Factory["AuthServiceI"] = Factory(AuthService, repository_user=user_repository, repository_settings=settings_repository)
     user_settings_service: Factory["UserSettingsServiceI"] = Factory(UserSettingsService,
@@ -54,6 +61,8 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                          repository=categories_repository)
     user_cash_accounts_service: Factory["UserCashAccountsServiceI"] = Factory(UserCashAccountsService,
                                                                               repository=cash_account_repository)
+    user_type_of_earnings_service: Factory["UserEarningsServiceI"] = Factory(UserEarningsService,
+                                                                              repository=type_of_earnings_repository)
     user_currency_service: Factory["UserCurrenciesServiceI"] = Factory(UserCurrenciesService,
                                                                               db_redis=redis_session_getter)
 

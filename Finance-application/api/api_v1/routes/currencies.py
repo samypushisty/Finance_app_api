@@ -7,7 +7,7 @@ from api.api_v1.services.environment_settings.currencies.schemas import Currency
 from secure import JwtInfo
 from secure.jwt_functions import validation
 
-router = APIRouter(prefix="/currencies",tags=["Currencies"])
+router = APIRouter(prefix="/currencies",tags=["EnvironmentSettings"])
 
 async def get_currencies_service() -> UserCurrenciesServiceI:
     return container.user_currency_service()
