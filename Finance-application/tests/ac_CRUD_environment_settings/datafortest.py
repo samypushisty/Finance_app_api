@@ -138,3 +138,54 @@ class DataForTestCurrencies:
         self.wrong_currency = {
             "name": "string",
         }
+
+
+class DataForTestTypeEarnings:
+    def __init__(self):
+        self.input = {
+            "name": "string",
+            "description": "string"
+        }
+
+
+        self.wrong_name = {
+            "name": "stringeringqwertyui",
+            "description": "string"
+        }
+
+
+        self.new_wrong_name = {
+            "earning_id": 2,
+            "name": "stringeringqwertyui",
+            "description": "string"
+        }
+
+        self.new_wrong_id = {
+            "earning_id": -2,
+            "name": "stringe",
+            "description": "string"
+        }
+        self.new_id_2 = {
+            "earning_id": 2,
+            "name": "strin",
+            "description": "string1"
+        }
+
+        self.new_id_4 = {
+            "earning_id": 4,
+            "name": "strin",
+            "description": "string1"
+        }
+        self.for_test = {
+            "earning_id": 1,
+            "chat_id": 9999999999,
+            "name": "string",
+            "description": "string"
+        }
+
+        self.for_test_patch = {
+            "earning_id": 1,
+            "chat_id": 9999999999,
+            "name": "strin",
+            "description": "string1"
+        }
