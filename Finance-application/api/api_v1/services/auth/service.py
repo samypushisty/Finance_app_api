@@ -3,7 +3,7 @@ from api.api_v1.services.auth.schemas import UserAuth, UserRegistration, JWTRead
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 from api.api_v1.services.user_settings.schemas import UserSettingsRead
 from secure import create_jwt
-
+from datetime import datetime, timezone
 
 from api.api_v1.services.auth.interface import AuthServiceI
 
@@ -20,5 +20,6 @@ class AuthService(AuthServiceI):
                                                      notifications=True, main_currency="usd")
             await self.repository_user.add(user_registration.model_dump())
             await self.repository_settings.add(user_settings.model_dump())
+        await self.repository_user.patch({"last_visit": datetime.now(timezone.utc).replace(tzinfo=None)},chat_id=user.chat_id)
         answer = create_jwt(user.chat_id)
         return GenericResponse[JWTRead](detail=JWTRead(jwt=answer))
