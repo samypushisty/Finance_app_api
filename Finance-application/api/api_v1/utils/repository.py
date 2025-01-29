@@ -36,9 +36,13 @@ class SQLAlchemyRepository(AbstractRepository):
     async def add(self, data: dict):
         async with self.session() as session:
             async with session.begin():
-                stmt = self.model(**data)
-                session.add(stmt)
-                await session.commit()
+                try:
+                    stmt = self.model(**data)
+                    session.add(stmt)
+                    await session.commit()
+                except:
+                    await session.rollback()
+                    raise StandartException(status_code=400, detail="Invalid data")
 
 
     async def find(self,**filters):
@@ -66,12 +70,16 @@ class SQLAlchemyRepository(AbstractRepository):
     async def patch(self, data: dict, **filters):
         async with self.session() as session:
             async with session.begin():
+
                 stmt = (
                     update(self.model)
                     .values(**data)
                     .filter_by(**filters)
                 )
-                result = await session.execute(stmt)
+                try:
+                    result = await session.execute(stmt)
+                except:
+                    raise StandartException(status_code=400, detail="Invalid data")
                 if result.rowcount == 0:
                     await session.rollback()
                     raise StandartException(status_code=404, detail="not found")
