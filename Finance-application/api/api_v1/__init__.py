@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from core.config import settings
 
 from api.api_v1.routes import (auth_router, user_categories_router,user_settings_router,user_cash_accounts_router,
-                               currency_router, type_of_earnings_router)
+                               currency_router, type_of_earnings_router, movies_router)
 
 
 router = APIRouter(
@@ -37,4 +37,8 @@ router.include_router(
 router.include_router(
     type_of_earnings_router,
     prefix=settings.api.v1.environment_settings,
+)
+router.include_router(
+    movies_router,
+    prefix=settings.api.v1.movies,
 )
