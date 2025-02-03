@@ -17,7 +17,6 @@ class UserCashAccountPost(BaseModel):
 
 class UserCashAccountPatch(BaseModel):
     cash_id: int
-    balance: float = Field(ge=0)
     name: str = Field(max_length=15)
     description: str = Field(max_length=256)
     type: CashAccountType

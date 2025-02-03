@@ -46,9 +46,8 @@ def test_get_all(client,data_for_test):
 @pytest.mark.parametrize("data_for_test",
                          [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.new_id_2)),
                           DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.new_id_4)),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.new_wrong_balance)),
                           DataForFixture(id=1234567897,data=DataDTO(status_code=404,data=data_test.new_wrong_id)),
-                          DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.new_wrong_balance))],
+                          DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.new_wrong_id))],
                          indirect=True, scope="function", ids=idfn)
 def test_patch(client,data_for_test):
     response = client.patch("/api/v1/environment_settings/cash_accounts",json=data_for_test.data.data, params={"token": data_for_test.token})

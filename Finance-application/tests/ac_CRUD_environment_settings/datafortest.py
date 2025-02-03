@@ -74,18 +74,8 @@ class DataForTestCashAccounts:
             "currency": "str"
         }
 
-        self.new_wrong_balance = {
-            "cash_id": 2,
-            "balance": -10,
-            "name": "string",
-            "description": "string",
-            "type": "cash",
-            "currency": "str"
-        }
-
         self.new_wrong_id = {
             "cash_id": -2,
-            "balance": 10,
             "name": "string",
             "description": "string",
             "type": "cash",
@@ -93,7 +83,6 @@ class DataForTestCashAccounts:
         }
         self.new_id_2 = {
             "cash_id": 2,
-            "balance": 100,
             "name": "stringn",
             "description": "stringn",
             "type": "card",
@@ -102,7 +91,6 @@ class DataForTestCashAccounts:
 
         self.new_id_4 = {
             "cash_id": 4,
-            "balance": 100,
             "name": "stringn",
             "description": "stringn",
             "type": "card",
@@ -110,8 +98,8 @@ class DataForTestCashAccounts:
         }
         self.for_test = {
             "cash_id": 1,
+            "balance": 10,
             "chat_id": 9999999999,
-            "balance": 10.0,
             "name": "string",
             "description": "string",
             "type": "cash",
@@ -120,8 +108,8 @@ class DataForTestCashAccounts:
 
         self.for_test_patch = {
             "cash_id": 1,
+            "balance": 10,
             "chat_id": 9999999999,
-            "balance": 100.0,
             "name": "stringn",
             "description": "stringn",
             "type": "card",
