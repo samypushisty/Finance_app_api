@@ -31,47 +31,52 @@ class DependencyContainer(containers.DeclarativeContainer):
     database_session: Resource["AsyncGenerator[AsyncSession, None]"] = Resource(database_helper.provided.session_getter)
     categories_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
-        session = database_session,
         model = Category,
     )
     cash_account_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
-        session = database_session,
         model = CashAccount,
     )
     settings_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
-        session = database_session,
         model = Settings,
     )
     user_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
-        session = database_session,
         model = User,
     )
     type_of_earnings_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
-        session=database_session,
         model=Earnings,
     )
     movies_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
-        session=database_session,
         model=MovieOnAccount,
     )
 
-    auth_service: Factory["AuthServiceI"] = Factory(AuthService, repository_user=user_repository, repository_settings=settings_repository)
+    auth_service: Factory["AuthServiceI"] = Factory(AuthService,
+                                                    repository_user=user_repository,
+                                                    repository_settings=settings_repository,
+                                                    database_session=database_session)
     user_settings_service: Factory["UserSettingsServiceI"] = Factory(UserSettingsService,
-                                                                     repository=settings_repository)
+                                                                     repository=settings_repository,
+                                                                     database_session=database_session)
     user_categories_service: Factory["UserCategoriesServiceI"] = Factory(UserCategoriesService,
-                                                                         repository=categories_repository)
+                                                                         repository=categories_repository,
+                                                                         database_session=database_session)
     user_cash_accounts_service: Factory["UserCashAccountsServiceI"] = Factory(UserCashAccountsService,
-                                                                              repository=cash_account_repository)
+                                                                              repository=cash_account_repository,
+                                                                              database_session=database_session)
     user_type_of_earnings_service: Factory["UserEarningsServiceI"] = Factory(UserEarningsService,
-                                                                              repository=type_of_earnings_repository)
+                                                                             repository=type_of_earnings_repository,
+                                                                             database_session=database_session)
     user_currency_service: Factory["UserCurrenciesServiceI"] = Factory(UserCurrenciesService,
-                                                                              db_redis=redis_session_getter)
+                                                                       db_redis=redis_session_getter,
+                                                                       database_session=database_session)
     user_movies_service: Factory["UserMovieServiceI"] = Factory(UserMovieService,
-                                                                             repository=movies_repository)
+                                                                repository=movies_repository,
+                                                                repository_cash_account=cash_account_repository,
+                                                                database_session=database_session
+                                                                )
 
 container = DependencyContainer()

@@ -3,10 +3,14 @@ from api.api_v1.services.environment_settings.currencies.schemas import Currenci
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
 from typing import Callable
 from redis.asyncio import Redis
+from typing import Callable
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 class UserCurrenciesService(UserCurrenciesServiceI):
-    def __init__(self,db_redis: Callable[..., Redis]) -> None:
+    def __init__(self,db_redis: Callable[..., Redis], database_session:Callable[..., AsyncSession]) -> None:
         self.db_redis = db_redis
+        self.session = database_session
 
 
     async def get_currencies(self) -> GenericResponse[CurrenciesRead]:
