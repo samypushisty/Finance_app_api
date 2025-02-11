@@ -1,12 +1,12 @@
 from typing import  List
 
-from pydantic import BaseModel, Field, field_validator
-
+from pydantic import BaseModel, Field, field_validator, condecimal
+from decimal import Decimal
 from core.models.base import CashAccountType
 
 
 class UserCashAccountPost(BaseModel):
-    balance: float = Field(ge=0)
+    balance: Decimal = Field(gt=0, decimal_places=2)
     name: str = Field(max_length=15)
     description: str = Field(max_length=256)
     type: CashAccountType
@@ -14,6 +14,7 @@ class UserCashAccountPost(BaseModel):
 
     class Config:
         use_enum_values = True
+
 
 class UserCashAccountPatch(BaseModel):
     cash_id: int

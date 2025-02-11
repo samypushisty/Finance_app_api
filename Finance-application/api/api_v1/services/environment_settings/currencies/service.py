@@ -3,7 +3,6 @@ from api.api_v1.services.environment_settings.currencies.schemas import Currenci
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
 from typing import Callable
 from redis.asyncio import Redis
-from typing import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

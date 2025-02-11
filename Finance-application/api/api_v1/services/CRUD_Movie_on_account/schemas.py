@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import  List, Optional
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator, condecimal
 
 from core.models.base import MovieType
 
@@ -10,7 +10,7 @@ class UserMoviePost(BaseModel):
     title: str = Field(max_length=15)
     description: str = Field(max_length=256)
     type: MovieType
-    worth: Decimal
+    worth: Decimal = Field(gt=0, decimal_places=2)
     cash_account: int
     categories_id: Optional[int] = None
     earnings_id: Optional[int] = None
@@ -30,7 +30,7 @@ class UserMoviePatch(BaseModel):
     title: str = Field(max_length=15)
     description: str = Field(max_length=256)
     type: MovieType
-    worth: Decimal
+    worth: Decimal = Field(gt=0, decimal_places=2)
     cash_account: int
     categories_id: Optional[int] = None
     earnings_id: Optional[int] = None
@@ -55,7 +55,7 @@ class UserMovieRead(BaseModel):
     title: str = Field(max_length=15)
     description: str = Field(max_length=256)
     type: MovieType
-    worth: Decimal
+    worth: Decimal = Field(gt=0, decimal_places=2)
     cash_account: int
     categories_id: Optional[int]
     earnings_id: Optional[int]

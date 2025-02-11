@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Annotated
-from sqlalchemy import ForeignKey, text, String, MetaData, BigInteger
+from sqlalchemy import ForeignKey, text, String, MetaData, BigInteger, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from core.config import settings
 import enum
@@ -56,7 +56,7 @@ class CashAccount(Base):
 
     cash_id: Mapped[intpk]
     chat_id: Mapped[intfk]
-    balance: Mapped[float]
+    balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     name: Mapped[str_15]
     description: Mapped[str_256]
     type: Mapped[CashAccountType]
@@ -98,7 +98,7 @@ class MovieOnAccount(Base):
     title: Mapped[str_15]
     description: Mapped[Optional[str_256]]
     type: Mapped[MovieType]
-    worth: Mapped[Decimal]
+    worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.cash_id", ondelete="CASCADE"))
     categories_id: Mapped[Optional[int]]
     earnings_id: Mapped[Optional[int]]
@@ -108,5 +108,5 @@ class MovieOnAccount(Base):
 class Balance(Base):
     __tablename__ = "balance"
     chat_id: Mapped[intfkpk]
-    total_balance: Mapped[float]
+    total_balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     balances_history: Mapped[str]
