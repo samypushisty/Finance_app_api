@@ -54,7 +54,7 @@ class DataForTestCashAccounts:
             "name": "string",
             "description": "string",
             "type": "cash",
-            "currency": "str"
+            "currency": "USD"
         }
 
 
@@ -63,7 +63,7 @@ class DataForTestCashAccounts:
             "name": "string",
             "description": "string",
             "type": "cash",
-            "currency": "str"
+            "currency": "USD"
         }
         
         self.wrong_description = {
@@ -71,7 +71,7 @@ class DataForTestCashAccounts:
             "name": "string",
             "description": "string"*50,
             "type": "cash",
-            "currency": "str"
+            "currency": "USD"
         }
 
         self.new_wrong_id = {
@@ -79,14 +79,12 @@ class DataForTestCashAccounts:
             "name": "string",
             "description": "string",
             "type": "cash",
-            "currency": "str"
         }
         self.new_id_2 = {
             "cash_id": 2,
             "name": "stringn",
             "description": "stringn",
             "type": "card",
-            "currency": "byn"
         }
 
         self.new_id_4 = {
@@ -94,7 +92,6 @@ class DataForTestCashAccounts:
             "name": "stringn",
             "description": "stringn",
             "type": "card",
-            "currency": "byn"
         }
         self.for_test = {
             "cash_id": 1,
@@ -103,7 +100,7 @@ class DataForTestCashAccounts:
             "name": "string",
             "description": "string",
             "type": "cash",
-            "currency": "str"
+            "currency": "USD"
         }
 
         self.for_test_patch = {
@@ -113,7 +110,7 @@ class DataForTestCashAccounts:
             "name": "stringn",
             "description": "stringn",
             "type": "card",
-            "currency": "byn"
+            "currency": "USD"
         }
 
 
