@@ -6,6 +6,12 @@ from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from core.config import settings
 import enum
 
+from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, create_engine, text
+from sqlalchemy.orm import declarative_base, sessionmaker
+from decimal import Decimal
+import enum
+
+
 str_3 = Annotated[str,3]
 str_15 = Annotated[str,15]
 str_256 = Annotated[str,256]
@@ -99,6 +105,7 @@ class MovieOnAccount(Base):
     description: Mapped[Optional[str_256]]
     type: Mapped[MovieType]
     worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
+    currency: Mapped[str_3]
     cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.cash_id", ondelete="CASCADE"))
     categories_id: Mapped[Optional[int]]
     earnings_id: Mapped[Optional[int]]
