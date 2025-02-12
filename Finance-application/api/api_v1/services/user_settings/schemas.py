@@ -1,9 +1,7 @@
 from typing import Optional
-
 from pydantic import BaseModel, Field, field_validator
-
-
 from core.models.base import Theme, Language
+from core.redis_db.redis_helper import redis_client
 
 
 class UserSettingsPatch(BaseModel):
@@ -14,6 +12,13 @@ class UserSettingsPatch(BaseModel):
 
     class Config:
         use_enum_values = True
+
+    @field_validator("main_currency", mode="after")
+    def validate_currency(cls, value: str):
+        value = value.upper()
+        if not redis_client.exists(value):
+            raise ValueError(f"Currency '{value}' does not exist in Redis")
+        return value
 
 
 class UserSettingsRead(BaseModel):
@@ -32,6 +37,14 @@ class UserSettingsRead(BaseModel):
         if isinstance(value, Language):
             return Language(value).value
         return value
+
+    @field_validator("main_currency", mode="after")
+    def validate_currency(cls, value: str):
+        value = value.upper()
+        if not redis_client.exists(value):
+            raise ValueError(f"Currency '{value}' does not exist in Redis")
+        return value
+
 
     @field_validator('theme', mode='before')
     def validate_theme(cls, value):
