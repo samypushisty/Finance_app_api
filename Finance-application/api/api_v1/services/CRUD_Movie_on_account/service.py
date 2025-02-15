@@ -1,4 +1,5 @@
 from decimal import Decimal
+from locale import currency
 
 from api.api_v1.services.CRUD_Movie_on_account.interface import UserMovieServiceI
 from api.api_v1.services.CRUD_Movie_on_account.schemas import UserMoviePost, UserMoviePatch, UserMoviesRead, \
@@ -6,7 +7,7 @@ from api.api_v1.services.CRUD_Movie_on_account.schemas import UserMoviePost, Use
 from api.api_v1.utils.converter import ConverterRepository
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
-from core.models.base import CashAccount
+from core.models.base import CashAccount, MovieOnAccount
 from secure import JwtInfo
 from typing import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,7 +22,7 @@ class UserMovieService(UserMovieServiceI):
     async def post_movie(self, user_movie: UserMoviePost, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                cash_account: CashAccount = await self.repository_cash_account.find(session=session,cash_id=user_movie.cash_account)
+                cash_account: CashAccount = await self.repository_cash_account.find(session=session, chat_id=token.id, cash_id=user_movie.cash_account)
                 base_currency: str = cash_account.currency
                 balance: Decimal = cash_account.balance
                 worth_in_base = await self.converter.convert(base_currency=base_currency, convert_currency=user_movie.currency, amount=user_movie.worth)
@@ -43,7 +44,48 @@ class UserMovieService(UserMovieServiceI):
     async def patch_movie(self, user_movie: UserMoviePatch, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.patch(session=session, data=user_movie.model_dump(),chat_id=token.id,
+                patch_data = user_movie.model_dump()
+                if user_movie.currency or user_movie.worth:
+                    print("change balnce")
+                    # получение старого движения по аккаунту
+                    old_movie: MovieOnAccount = await self.repository.find(session=session, chat_id=token.id, movie_id=user_movie.movie_id)
+                    cash_account: CashAccount = await self.repository_cash_account.find(session=session,
+                                                                                        chat_id=token.id,
+                                                                                        cash_id=old_movie.cash_account)
+
+                    # проверки есть ли валюта или количество
+                    if not user_movie.currency:
+                        movie_currency = old_movie.currency
+                    else:
+                        movie_currency = user_movie.currency
+                    if not user_movie.worth:
+                        movie_worth = old_movie.worth
+                    else:
+                        movie_worth = user_movie.worth
+
+                    # получение нужных цифр
+
+                    old_worth = old_movie.base_worth
+                    base_currency: str = cash_account.currency
+
+                    print(base_currency,movie_currency,movie_worth)
+                    # получение конвертированной суммы
+                    worth_in_base = await self.converter.convert(base_currency=base_currency,
+                                                             convert_currency=movie_currency,
+                                                             amount=movie_worth)
+                    # изменение баланса
+                    balance: Decimal = cash_account.balance
+                    balance -= old_worth
+                    balance += worth_in_base
+                    if balance < 0:
+                        raise StandartException(status_code=403, detail="balance < 0")
+                    await self.repository_cash_account.patch(session=session,
+                                                             data={"balance": balance},
+                                                             chat_id=token.id,
+                                                             cash_id=old_movie.cash_account)
+                    # изменение баззовой суммы
+                    patch_data["base_worth"] = worth_in_base
+                await self.repository.patch(session=session, data=patch_data,chat_id=token.id,
                                     movie_id=user_movie.movie_id)
 
 
