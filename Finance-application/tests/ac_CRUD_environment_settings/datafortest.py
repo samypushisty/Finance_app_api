@@ -84,18 +84,16 @@ class DataForTestCashAccounts:
             "cash_id": 2,
             "name": "stringn",
             "description": "stringn",
-            "type": "card",
         }
 
         self.new_id_4 = {
             "cash_id": 4,
             "name": "stringn",
             "description": "stringn",
-            "type": "card",
         }
         self.for_test = {
             "cash_id": 1,
-            "balance": 10,
+            "balance": "10.00",
             "chat_id": 9999999999,
             "name": "string",
             "description": "string",
@@ -105,11 +103,11 @@ class DataForTestCashAccounts:
 
         self.for_test_patch = {
             "cash_id": 1,
-            "balance": 10,
+            "balance": "10.00",
             "chat_id": 9999999999,
             "name": "stringn",
             "description": "stringn",
-            "type": "card",
+            "type": "cash",
             "currency": "USD"
         }
 

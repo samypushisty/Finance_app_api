@@ -6,12 +6,6 @@ from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from core.config import settings
 import enum
 
-from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, create_engine, text
-from sqlalchemy.orm import declarative_base, sessionmaker
-from decimal import Decimal
-import enum
-
-
 str_3 = Annotated[str,3]
 str_15 = Annotated[str,15]
 str_256 = Annotated[str,256]

@@ -38,9 +38,9 @@ class DatabaseHelper:
     @asynccontextmanager
     async def session_getter(self) -> AsyncGenerator[AsyncSession, None]:
         async with self.session_factory() as session:
-            print("open")
+            print("open_sql")
             yield session
-        print("close")
+        print("close_sql")
 
 
 db_helper = DatabaseHelper(

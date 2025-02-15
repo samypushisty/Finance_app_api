@@ -21,12 +21,14 @@ class UserMoviePost(BaseModel):
 
     @model_validator(mode="after")
     def check_passwords_match(self) -> "UserMoviePost":
-        if (not self.categories_id is None) and (not self.earnings_id is None) or (self.categories_id is None and self.earnings_id is None):
+        if ((self.type == "earning" and (not self.categories_id is None) and self.earnings_id is None) or
+                (self.type == "outlay" and (not self.earnings_id is None) and self.categories_id is None)):
             raise ValueError("should be one of categories_id and earnings_id")
         return self
 
     @field_validator("currency", mode="after")
-    def validate_type(cls, value):
+    def validate_currency(cls, value):
+        value = value.upper()
         if not redis_client.exists(value):
             raise ValueError(f"Currency '{value}' does not exist in Redis")
         return value
@@ -36,16 +38,6 @@ class UserMoviePatch(BaseModel):
     movie_id: int
     title: str = Field(max_length=15)
     description: str = Field(max_length=256)
-    type: MovieType
-
-    class Config:
-        use_enum_values = True
-
-    @model_validator(mode="after")
-    def check_passwords_match(self) -> "UserMoviePatch":
-        if self.categories_id and self.earnings_id:
-            raise ValueError("should be one of categories_id and earnings_id")
-        return self
 
 
 class UserMovieGet(BaseModel):
@@ -67,12 +59,6 @@ class UserMovieRead(BaseModel):
         validate_assignment = True
         use_enum_values = True
 
-    @field_validator("type", mode="before")
-    def validate_currency(cls, value: str):
-        value = value.upper()
-        if isinstance(value, MovieType):
-            return MovieType(value).value
-        return value
 
 
 class UserMoviesRead(BaseModel):

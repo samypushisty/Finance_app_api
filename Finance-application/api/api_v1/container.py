@@ -8,6 +8,7 @@ from api.api_v1.services.user_settings.interface import UserSettingsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_categories import UserCategoriesServiceI, UserCategoriesService
 from api.api_v1.services.environment_settings.CRUD_user_cash_accounts import UserCashAccountsService,UserCashAccountsServiceI
 from api.api_v1.services.user_settings.service import UserSettingsService
+from api.api_v1.utils.converter import ConverterRepository
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from core.config import settings
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,6 +30,10 @@ class DependencyContainer(containers.DeclarativeContainer):
         max_overflow=settings.db.max_overflow,
     )
     database_session: Resource["AsyncGenerator[AsyncSession, None]"] = Resource(database_helper.provided.session_getter)
+    converter_repository: Singleton["ConverterRepository"] = Singleton(
+        ConverterRepository,
+        db_redis = redis_session_getter
+    )
     categories_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
         model = Category,
@@ -74,6 +79,7 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                        db_redis=redis_session_getter,
                                                                        database_session=database_session)
     user_movies_service: Factory["UserMovieServiceI"] = Factory(UserMovieService,
+                                                                converter = converter_repository,
                                                                 repository=movies_repository,
                                                                 repository_cash_account=cash_account_repository,
                                                                 database_session=database_session

@@ -1,14 +1,19 @@
+from decimal import Decimal
+
 from api.api_v1.services.CRUD_Movie_on_account.interface import UserMovieServiceI
 from api.api_v1.services.CRUD_Movie_on_account.schemas import UserMoviePost, UserMoviePatch, UserMoviesRead, \
     UserMovieRead, UserMovieGet
+from api.api_v1.utils.converter import ConverterRepository
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
+from core.models.base import CashAccount
 from secure import JwtInfo
 from typing import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
 
 class UserMovieService(UserMovieServiceI):
-    def __init__(self, repository: SQLAlchemyRepository, repository_cash_account: SQLAlchemyRepository, database_session:Callable[..., AsyncSession]) -> None:
+    def __init__(self, converter: ConverterRepository, repository: SQLAlchemyRepository, repository_cash_account: SQLAlchemyRepository, database_session:Callable[..., AsyncSession]) -> None:
+        self.converter = converter
         self.repository = repository
         self.repository_cash_account = repository_cash_account
         self.session = database_session
@@ -16,7 +21,23 @@ class UserMovieService(UserMovieServiceI):
     async def post_movie(self, user_movie: UserMoviePost, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.add(session=session,data={"chat_id": token.id,**user_movie.model_dump()})
+                cash_account: CashAccount = await self.repository_cash_account.find(session=session,cash_id=user_movie.cash_account)
+                base_currency: str = cash_account.currency
+                balance: Decimal = cash_account.balance
+                worth_in_base = await self.converter.convert(base_currency=base_currency, convert_currency=user_movie.currency, amount=user_movie.worth)
+                print(type(worth_in_base))
+                await self.repository.add(session=session, data={"chat_id": token.id,"base_worth":worth_in_base, **user_movie.model_dump()})
+                if user_movie.type == "outlay":
+                    balance -= worth_in_base
+                    if balance < 0:
+                        raise StandartException(status_code=403, detail="balance < 0")
+
+                elif user_movie.type == "earning":
+                    balance += worth_in_base
+                await self.repository_cash_account.patch(session=session,
+                                                         data={"balance":balance},
+                                                         chat_id=token.id,
+                                                         cash_id=user_movie.cash_account)
 
 
     async def patch_movie(self, user_movie: UserMoviePatch, token: JwtInfo) -> None:

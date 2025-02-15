@@ -28,10 +28,6 @@ class UserCashAccountPatch(BaseModel):
     cash_id: int
     name: str = Field(max_length=15)
     description: str = Field(max_length=256)
-    type: CashAccountType
-
-    class Config:
-        use_enum_values = True
 
 class UserCashAccountGet(BaseModel):
     cash_id: int
@@ -40,7 +36,7 @@ class UserCashAccountGet(BaseModel):
 class UserCashAccountRead(BaseModel):
     cash_id: int
     chat_id: int = Field(ge=10000000, le=10000000000)
-    balance: float = Field(ge=0)
+    balance: Decimal = Field(gt=0, decimal_places=2)
     name: str = Field(max_length=15)
     description: str = Field(max_length=256)
     type: CashAccountType
