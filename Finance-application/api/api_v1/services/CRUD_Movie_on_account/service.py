@@ -113,4 +113,21 @@ class UserMovieService(UserMovieServiceI):
     async def delete_movie(self, user_movie: UserMovieGet, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
+                # получение нужных таблиц
+                old_movie: MovieOnAccount = await self.repository.find(session=session, chat_id=token.id,
+                                                                       movie_id=user_movie.movie_id)
+                cash_account: CashAccount = await self.repository_cash_account.find(session=session,
+                                                                                    chat_id=token.id,
+                                                                                    cash_id=old_movie.cash_account)
+                # изменение баланса
+                old_worth = old_movie.base_worth
+                balance: Decimal = cash_account.balance
+                if old_movie.type.value == "earning":
+                    balance -= old_worth
+                else:
+                    balance += old_worth
+                await self.repository_cash_account.patch(session=session,
+                                                         data={"balance": balance},
+                                                         chat_id=token.id,
+                                                         cash_id=old_movie.cash_account)
                 await self.repository.delete(session=session,chat_id=token.id,movie_id=user_movie.movie_id)
