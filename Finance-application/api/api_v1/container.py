@@ -8,14 +8,14 @@ from api.api_v1.services.user_settings.interface import UserSettingsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_categories import UserCategoriesServiceI, UserCategoriesService
 from api.api_v1.services.environment_settings.CRUD_user_cash_accounts import UserCashAccountsService,UserCashAccountsServiceI
 from api.api_v1.services.user_settings.service import UserSettingsService
-from api.api_v1.utils.converter import ConverterRepository
+from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from core.config import settings
 from sqlalchemy.ext.asyncio import AsyncSession
 from collections.abc import AsyncGenerator
 from api.api_v1.services.auth.interface import AuthServiceI
 from api.api_v1.services.auth.service import AuthService
-from core.models.base import Category, CashAccount, Settings, User, Earnings, MovieOnAccount
+from core.models.base import Category, CashAccount, UserSettings, User, Earnings, MovieOnAccount, Balance
 from core.models.db_helper import DatabaseHelper
 from core.redis_db.redis_helper import redis_session_getter
 
@@ -30,8 +30,8 @@ class DependencyContainer(containers.DeclarativeContainer):
         max_overflow=settings.db.max_overflow,
     )
     database_session: Resource["AsyncGenerator[AsyncSession, None]"] = Resource(database_helper.provided.session_getter)
-    converter_repository: Singleton["ConverterRepository"] = Singleton(
-        ConverterRepository,
+    work_with_money_repository: Singleton["WorkWithMoneyRepository"] = Singleton(
+        WorkWithMoneyRepository,
         db_redis = redis_session_getter
     )
     categories_repository: Singleton["SQLAlchemyRepository"] = Singleton(
@@ -44,7 +44,7 @@ class DependencyContainer(containers.DeclarativeContainer):
     )
     settings_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
-        model = Settings,
+        model = UserSettings,
     )
     user_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
@@ -59,9 +59,15 @@ class DependencyContainer(containers.DeclarativeContainer):
         model=MovieOnAccount,
     )
 
+    balance_repository: Singleton["SQLAlchemyRepository"] = Singleton(
+        SQLAlchemyRepository,
+        model=Balance,
+    )
+
     auth_service: Factory["AuthServiceI"] = Factory(AuthService,
                                                     repository_user=user_repository,
                                                     repository_settings=settings_repository,
+                                                    repository_balance=balance_repository,
                                                     database_session=database_session)
     user_settings_service: Factory["UserSettingsServiceI"] = Factory(UserSettingsService,
                                                                      repository=settings_repository,
@@ -70,7 +76,9 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                          repository=categories_repository,
                                                                          database_session=database_session)
     user_cash_accounts_service: Factory["UserCashAccountsServiceI"] = Factory(UserCashAccountsService,
+                                                                              work_with_money=work_with_money_repository,
                                                                               repository=cash_account_repository,
+                                                                              repository_balance=balance_repository,
                                                                               database_session=database_session)
     user_type_of_earnings_service: Factory["UserEarningsServiceI"] = Factory(UserEarningsService,
                                                                              repository=type_of_earnings_repository,
@@ -79,9 +87,10 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                        db_redis=redis_session_getter,
                                                                        database_session=database_session)
     user_movies_service: Factory["UserMovieServiceI"] = Factory(UserMovieService,
-                                                                converter = converter_repository,
+                                                                work_with_money = work_with_money_repository,
                                                                 repository=movies_repository,
                                                                 repository_cash_account=cash_account_repository,
+                                                                repository_balance=balance_repository,
                                                                 database_session=database_session
                                                                 )
 

@@ -1,4 +1,6 @@
 from api.api_v1.utils.repository import SQLAlchemyRepository
+from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
+from core.models.base import Balance
 from .interface import UserCashAccountsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_cash_accounts.schemas import UserCashAccountPost, \
     UserCashAccountPatch, UserCashAccountsRead, UserCashAccountRead, UserCashAccountGet
@@ -9,8 +11,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UserCashAccountsService(UserCashAccountsServiceI):
-    def __init__(self, repository: SQLAlchemyRepository, database_session:Callable[..., AsyncSession]) -> None:
+    def __init__(self, repository: SQLAlchemyRepository,
+                 work_with_money:WorkWithMoneyRepository,
+                 repository_balance: SQLAlchemyRepository,
+                 database_session:Callable[..., AsyncSession]) -> None:
+        self.work_with_money = work_with_money
         self.repository = repository
+        self.repository_balance = repository_balance
         self.session = database_session
 
 
@@ -19,6 +26,14 @@ class UserCashAccountsService(UserCashAccountsServiceI):
         async with self.session() as session:
             async with session.begin():
                 await self.repository.add(session=session,data={"chat_id": token.id, **user_cash_account.model_dump()})
+                main_balance: Balance = await self.repository_balance.find(session=session, chat_id=token.id)
+                main_account_worth = await self.work_with_money.convert(base_currency="RUB",
+                                                                        convert_currency=user_cash_account.currency,
+                                                                        amount=user_cash_account.balance)
+                balance = main_balance.total_balance + main_account_worth
+                await self.repository_balance.patch(session=session,
+                                                    data={"total_balance": balance},
+                                                    chat_id=token.id)
 
 
     async def patch_user_category(self, user_cash_account: UserCashAccountPatch, token: JwtInfo) -> None:
@@ -52,4 +67,14 @@ class UserCashAccountsService(UserCashAccountsServiceI):
     async def delete_user_category(self,user_cash_account: UserCashAccountGet, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
+                cash_account = await self.repository.find(session=session, chat_id=token.id,
+                                                    cash_id=user_cash_account.cash_id)
+                main_account_worth = await self.work_with_money.convert(base_currency="RUB",
+                                                                        convert_currency=cash_account.currency,
+                                                                        amount=cash_account.balance)
+                main_balance: Balance = await self.repository_balance.find(session=session, chat_id=token.id)
+                balance = main_balance.total_balance - main_account_worth
+                await self.repository_balance.patch(session=session,
+                                                    data={"total_balance": balance},
+                                                    chat_id=token.id)
                 await self.repository.delete(session=session, chat_id=token.id, cash_id=user_cash_account.cash_id)

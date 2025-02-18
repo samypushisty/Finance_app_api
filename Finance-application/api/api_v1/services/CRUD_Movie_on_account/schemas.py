@@ -21,10 +21,11 @@ class UserMoviePost(BaseModel):
 
     @model_validator(mode="after")
     def check_passwords_match(self) -> "UserMoviePost":
-        if ((self.type == "earning" and (not self.categories_id is None) and self.earnings_id is None) or
-                (self.type == "outlay" and (not self.earnings_id is None) and self.categories_id is None)):
-            raise ValueError("should be one of categories_id and earnings_id")
-        return self
+        if ((self.type == "earning" and (not self.earnings_id is None) and self.categories_id is None) or
+                (self.type == "outlay" and (not self.categories_id is None) and self.earnings_id is None)):
+            return self
+        raise ValueError("should be one of categories_id and earnings_id")
+
 
     @field_validator("currency", mode="after")
     def validate_currency(cls, value):

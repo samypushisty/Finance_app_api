@@ -1,90 +1,125 @@
-from decimal import Decimal
-from locale import currency
-
 from api.api_v1.services.CRUD_Movie_on_account.interface import UserMovieServiceI
 from api.api_v1.services.CRUD_Movie_on_account.schemas import UserMoviePost, UserMoviePatch, UserMoviesRead, \
     UserMovieRead, UserMovieGet
-from api.api_v1.utils.converter import ConverterRepository
+from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
-from core.models.base import CashAccount, MovieOnAccount
+from core.models.base import CashAccount, MovieOnAccount, Balance
 from secure import JwtInfo
 from typing import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
 
 class UserMovieService(UserMovieServiceI):
-    def __init__(self, converter: ConverterRepository, repository: SQLAlchemyRepository, repository_cash_account: SQLAlchemyRepository, database_session:Callable[..., AsyncSession]) -> None:
-        self.converter = converter
+    def __init__(self,
+                 work_with_money:WorkWithMoneyRepository,
+                 repository: SQLAlchemyRepository,
+                 repository_cash_account: SQLAlchemyRepository,
+                 repository_balance: SQLAlchemyRepository,
+                 database_session:Callable[..., AsyncSession]) -> None:
+        self.work_with_money = work_with_money
         self.repository = repository
         self.repository_cash_account = repository_cash_account
         self.session = database_session
+        self.repository_balance = repository_balance
+
 
     async def post_movie(self, user_movie: UserMoviePost, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
+                # получение информации
                 cash_account: CashAccount = await self.repository_cash_account.find(session=session, chat_id=token.id, cash_id=user_movie.cash_account)
-                base_currency: str = cash_account.currency
-                balance: Decimal = cash_account.balance
-                worth_in_base = await self.converter.convert(base_currency=base_currency, convert_currency=user_movie.currency, amount=user_movie.worth)
-                print(type(worth_in_base))
-                await self.repository.add(session=session, data={"chat_id": token.id,"base_worth":worth_in_base, **user_movie.model_dump()})
-                if user_movie.type == "outlay":
-                    balance -= worth_in_base
-                    if balance < 0:
-                        raise StandartException(status_code=403, detail="balance < 0")
+                if not cash_account:
+                    raise StandartException(status_code=404, detail="not found cash_account")
+                main_account: Balance = await self.repository_balance.find(session=session, chat_id=token.id)
 
-                elif user_movie.type == "earning":
-                    balance += worth_in_base
+                # получение валют
+                cash_account_currency: str = cash_account.currency
+                movie_currency: str = user_movie.currency
+                # конвертация денег
+                cash_account_worth = await self.work_with_money.convert(base_currency=cash_account_currency,
+                                                             convert_currency=movie_currency,
+                                                             amount=user_movie.worth)
+                main_account_worth = await self.work_with_money.convert(base_currency="RUB",
+                                                             convert_currency=movie_currency,
+                                                             amount=user_movie.worth)
+                # добавление операции
+                await self.repository.add(session=session, data={"chat_id": token.id, "cash_account_worth": cash_account_worth,
+                                                                 "main_account_worth": main_account_worth,
+                                                                 **user_movie.model_dump()})
+                # изменение баланса кешаккаунта
+                balance = await self.work_with_money.add_transaction(old_balance=cash_account.balance,
+                                                               type_operation=user_movie.type,
+                                                               amount=cash_account_worth)
                 await self.repository_cash_account.patch(session=session,
                                                          data={"balance":balance},
                                                          chat_id=token.id,
                                                          cash_id=user_movie.cash_account)
+                # изменение баланса всего аккаунта
+                balance = await self.work_with_money.add_transaction(old_balance=main_account.total_balance,
+                                                                     type_operation=user_movie.type,
+                                                                     amount=main_account_worth)
+                await self.repository_balance.patch(session=session,
+                                                         data={"total_balance": balance},
+                                                         chat_id=token.id)
 
 
     async def patch_movie(self, user_movie: UserMoviePatch, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                patch_data = user_movie.model_dump()
+                patch_data = user_movie.model_dump(exclude_unset=True)
                 if user_movie.currency or user_movie.worth:
-                    print("change balnce")
-                    # получение старого движения по аккаунту
-                    old_movie: MovieOnAccount = await self.repository.find(session=session, chat_id=token.id, movie_id=user_movie.movie_id)
-                    cash_account: CashAccount = await self.repository_cash_account.find(session=session,
-                                                                                        chat_id=token.id,
+                    # получение информации
+                    old_movie: MovieOnAccount = await self.repository.find(session=session, chat_id=token.id,
+                                                                           movie_id=user_movie.movie_id)
+                    cash_account: CashAccount = await self.repository_cash_account.find(session=session,chat_id=token.id,
                                                                                         cash_id=old_movie.cash_account)
+                    if not cash_account:
+                        raise StandartException(status_code=404, detail="not found cash_account")
+                    main_account: Balance = await self.repository_balance.find(session=session, chat_id=token.id)
 
-                    # проверки есть ли валюта или количество
+                    # полуение валют
                     if not user_movie.currency:
                         movie_currency = old_movie.currency
                     else:
                         movie_currency = user_movie.currency
+                    cash_account_currency: str = cash_account.currency
+
+                    # получение старой стоймостей
                     if not user_movie.worth:
                         movie_worth = old_movie.worth
                     else:
                         movie_worth = user_movie.worth
+                    old_cash_account_worth = old_movie.cash_account_worth
+                    old_main_account_worth = old_movie.main_account_worth
 
-                    # получение нужных цифр
-
-                    old_worth = old_movie.base_worth
-                    base_currency: str = cash_account.currency
-
-                    print(base_currency,movie_currency,movie_worth)
-                    # получение конвертированной суммы
-                    worth_in_base = await self.converter.convert(base_currency=base_currency,
+                    # получение конвертированной стоймости кеш аккаунта
+                    cash_account_worth = await self.work_with_money.convert(base_currency=cash_account_currency,
                                                              convert_currency=movie_currency,
                                                              amount=movie_worth)
-                    # изменение баланса
-                    balance: Decimal = cash_account.balance
-                    balance -= old_worth
-                    balance += worth_in_base
-                    if balance < 0:
-                        raise StandartException(status_code=403, detail="balance < 0")
+                    # изменение баланса кеш аккаунта
+                    balance = await self.work_with_money.edit_transaction(old_balance=cash_account.balance,
+                                                                         type_operation=old_movie.type.value,
+                                                                         old_amount=old_cash_account_worth,
+                                                                         new_amount=cash_account_worth)
                     await self.repository_cash_account.patch(session=session,
                                                              data={"balance": balance},
                                                              chat_id=token.id,
                                                              cash_id=old_movie.cash_account)
-                    # изменение баззовой суммы
-                    patch_data["base_worth"] = worth_in_base
+                    # получение конвертированной стоймости общего аккаунта
+                    main_account_worth = await self.work_with_money.convert(base_currency="RUB",
+                                                                       convert_currency=movie_currency,
+                                                                       amount=movie_worth)
+                    # изменение баланса общего аккаунта
+                    balance = await self.work_with_money.edit_transaction(old_balance=main_account.total_balance,
+                                                                          type_operation=old_movie.type.value,
+                                                                          old_amount=old_main_account_worth,
+                                                                          new_amount=main_account_worth)
+                    await self.repository_balance.patch(session=session,
+                                                             data={"total_balance": balance},
+                                                             chat_id=token.id,)
+                    # изменение движения по аккаунту
+                    patch_data["cash_account_worth"] = cash_account_worth
+                    patch_data["main_account_worth"] = main_account_worth
                 await self.repository.patch(session=session, data=patch_data,chat_id=token.id,
                                     movie_id=user_movie.movie_id)
 
@@ -119,15 +154,27 @@ class UserMovieService(UserMovieServiceI):
                 cash_account: CashAccount = await self.repository_cash_account.find(session=session,
                                                                                     chat_id=token.id,
                                                                                     cash_id=old_movie.cash_account)
-                # изменение баланса
-                old_worth = old_movie.base_worth
-                balance: Decimal = cash_account.balance
-                if old_movie.type.value == "earning":
-                    balance -= old_worth
-                else:
-                    balance += old_worth
+                if not cash_account:
+                    raise StandartException(status_code=404, detail="not found cash_account")
+                main_account: Balance = await self.repository_balance.find(session=session, chat_id=token.id)
+                # получение старых стоймостей
+                old_cash_account_worth = old_movie.cash_account_worth
+                old_main_account_worth = old_movie.main_account_worth
+                # изменение баланса кеш аккаунта
+                balance = await self.work_with_money.delete_transaction(old_balance= cash_account.balance,
+                                                                     type_operation=old_movie.type.value,
+                                                                     amount=old_cash_account_worth)
+
                 await self.repository_cash_account.patch(session=session,
                                                          data={"balance": balance},
                                                          chat_id=token.id,
                                                          cash_id=old_movie.cash_account)
+                # изменение баланса главного аккаунта
+                balance = await self.work_with_money.delete_transaction(old_balance=main_account.total_balance,
+                                                                        type_operation=old_movie.type.value,
+                                                                        amount=old_main_account_worth)
+
+                await self.repository_balance.patch(session=session,
+                                                         data={"total_balance": balance},
+                                                         chat_id=token.id)
                 await self.repository.delete(session=session,chat_id=token.id,movie_id=user_movie.movie_id)
