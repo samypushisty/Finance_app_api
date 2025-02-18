@@ -1,4 +1,4 @@
-from typing import  List
+from typing import  List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -9,9 +9,9 @@ class UserCategoryPost(BaseModel):
     name: str = Field(max_length=15)
 
 class UserCategoryPatch(BaseModel):
-    category_id: int
-    month_limit: float = Field(ge=0)
-    name: str = Field(max_length=15)
+    category_id: Optional[int] = None
+    month_limit: Optional[float] = Field(None, ge=0)
+    name: Optional[str] = Field(None, max_length=15)
 
 class UserCategoryGet(BaseModel):
     category_id: int

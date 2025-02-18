@@ -16,7 +16,7 @@ class UserSettingsService(UserSettingsServiceI):
         token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.patch(session=session, data=user_settings.model_dump(), chat_id=token.id)
+                await self.repository.patch(session=session, data=user_settings.model_dump(exclude_unset=True), chat_id=token.id)
 
 
     async def get_settings(self, token: JwtInfo) -> GenericResponse[UserSettingsRead]:

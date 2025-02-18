@@ -1,4 +1,4 @@
-from typing import  List
+from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator, condecimal
 from decimal import Decimal
@@ -25,9 +25,9 @@ class UserCashAccountPost(BaseModel):
 
 
 class UserCashAccountPatch(BaseModel):
-    cash_id: int
-    name: str = Field(max_length=15)
-    description: str = Field(max_length=256)
+    cash_id: Optional[int] = None
+    name: Optional[str] = Field(None, max_length=15)
+    description: Optional[str] = Field(None, max_length=256)
 
 class UserCashAccountGet(BaseModel):
     cash_id: int

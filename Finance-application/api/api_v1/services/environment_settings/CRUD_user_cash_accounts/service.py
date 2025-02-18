@@ -24,8 +24,8 @@ class UserCashAccountsService(UserCashAccountsServiceI):
     async def patch_user_category(self, user_cash_account: UserCashAccountPatch, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.patch(session=session,data=user_cash_account.model_dump(), chat_id=token.id,
-                                            cash_id=user_cash_account.cash_id)
+                await self.repository.patch(session=session,data=user_cash_account.model_dump(exclude_unset=True),
+                                            chat_id=token.id, cash_id=user_cash_account.cash_id)
 
 
     async def get_user_categories(self, token: JwtInfo) -> GenericResponse[UserCashAccountsRead]:

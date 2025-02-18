@@ -36,16 +36,17 @@ class UserMoviePost(BaseModel):
 
 class UserMoviePatch(BaseModel):
     movie_id: int
-    title: Optional[str] = Field(max_length=15)
-    description: Optional[str] = Field(max_length=256)
-    worth: Optional[Decimal] = Field(gt=0, decimal_places=2)
-    currency: Optional[str] = Field(max_length=3)
+    title: Optional[str] = Field(None, max_length=15)
+    description: Optional[str] = Field(None,max_length=256)
+    worth: Optional[Decimal] = Field(None,gt=0, decimal_places=2)
+    currency: Optional[str] = Field(None,max_length=3)
 
     @field_validator("currency", mode="after")
     def validate_currency(cls, value):
-        value = value.upper()
-        if not redis_client.exists(value):
-            raise ValueError(f"Currency '{value}' does not exist in Redis")
+        if value:
+            value = value.upper()
+            if not redis_client.exists(value):
+                raise ValueError(f"Currency '{value}' does not exist in Redis")
         return value
 
 class UserMovieGet(BaseModel):

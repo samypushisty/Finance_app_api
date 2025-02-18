@@ -23,8 +23,8 @@ class UserCategoriesService(UserCategoriesServiceI):
     async def patch_user_category(self, user_category: UserCategoryPatch, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.patch(session=session, data=user_category.model_dump(),chat_id=token.id,
-                                            category_id=user_category.category_id)
+                await self.repository.patch(session=session, data=user_category.model_dump(exclude_unset=True),
+                                            chat_id=token.id, category_id=user_category.category_id)
 
 
     async def get_user_categories(self, token: JwtInfo) -> GenericResponse[UserCategoriesRead]:

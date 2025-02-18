@@ -1,4 +1,4 @@
-from typing import  List
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -10,9 +10,9 @@ class UserTypeEarningsPost(BaseModel):
 
 
 class UserTypeEarningsPatch(BaseModel):
-    earning_id: int
-    name: str = Field(max_length=15)
-    description: str = Field(max_length=256)
+    earning_id: Optional[int] = None
+    name: Optional[str] = Field(None, max_length=15)
+    description: Optional[str] = Field(None, max_length=256)
 
 class UserTypeEarningsGet(BaseModel):
     earning_id: int

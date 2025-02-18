@@ -5,19 +5,20 @@ from core.redis_db.redis_helper import redis_client
 
 
 class UserSettingsPatch(BaseModel):
-    theme: Optional[Theme]
-    language: Optional[Language]
-    notifications: Optional[bool]
-    main_currency: Optional[str] = Field(max_length=3)
+    theme: Optional[Theme] = None
+    language: Optional[Language] = None
+    notifications: Optional[bool] = None
+    main_currency: Optional[str] = Field(None, max_length=3)
 
     class Config:
         use_enum_values = True
 
     @field_validator("main_currency", mode="after")
     def validate_currency(cls, value: str):
-        value = value.upper()
-        if not redis_client.exists(value):
-            raise ValueError(f"Currency '{value}' does not exist in Redis")
+        if value:
+            value = value.upper()
+            if not redis_client.exists(value):
+                raise ValueError(f"Currency '{value}' does not exist in Redis")
         return value
 
 

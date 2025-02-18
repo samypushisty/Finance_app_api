@@ -22,8 +22,8 @@ class UserEarningsService(UserEarningsServiceI):
     async def patch_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsPatch, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.patch(session=session, data=user_type_of_earnings.model_dump(),chat_id=token.id,
-                                    earning_id=user_type_of_earnings.earning_id)
+                await self.repository.patch(session=session, data=user_type_of_earnings.model_dump(exclude_unset=True),
+                                            chat_id=token.id, earning_id=user_type_of_earnings.earning_id)
 
 
     async def get_types_of_earnings(self, token: JwtInfo) -> GenericResponse[UserTypesEarningsRead]:
