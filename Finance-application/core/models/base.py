@@ -78,7 +78,7 @@ class Earnings(Base):
     description: Mapped[str_256]
 
 # таблица с сетами
-class Settings(Base):
+class UserSettings(Base):
     __tablename__ = "settings"
 
     chat_id: Mapped[intfkpk]
