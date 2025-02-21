@@ -103,8 +103,8 @@ class MovieOnAccount(Base):
     cash_account_worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     main_account_worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.cash_id", ondelete="CASCADE"))
-    categories_id: Mapped[Optional[int]]
-    earnings_id: Mapped[Optional[int]]
+    categories_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("category.category_id", ondelete="CASCADE"))
+    earnings_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("earnings.earning_id", ondelete="CASCADE"))
     time: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
 
 
