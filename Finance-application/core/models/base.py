@@ -69,6 +69,8 @@ class Category(Base):
     chat_id: Mapped[intfk]
     month_limit: Mapped[float]
     name: Mapped[str_15]
+    balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
+    currency: Mapped[str_3]
 
 class Earnings(Base):
     __tablename__ = "earnings"
@@ -76,6 +78,9 @@ class Earnings(Base):
     earning_id: Mapped[intpk]
     name: Mapped[str_15]
     description: Mapped[str_256]
+    balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
+    currency: Mapped[str_3]
+
 
 # таблица с сетами
 class UserSettings(Base):

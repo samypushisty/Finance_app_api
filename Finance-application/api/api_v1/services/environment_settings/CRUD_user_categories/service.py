@@ -17,7 +17,7 @@ class UserCategoriesService(UserCategoriesServiceI):
         token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.add(session=session,data={"chat_id": token.id,**user_category.model_dump()})
+                await self.repository.add(session=session,data={"chat_id": token.id, "balance": 0, **user_category.model_dump()})
 
 
     async def patch_user_category(self, user_category: UserCategoryPatch, token: JwtInfo) -> None:

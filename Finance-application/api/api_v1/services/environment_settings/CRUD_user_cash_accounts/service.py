@@ -69,6 +69,8 @@ class UserCashAccountsService(UserCashAccountsServiceI):
             async with session.begin():
                 cash_account = await self.repository.find(session=session, chat_id=token.id,
                                                     cash_id=user_cash_account.cash_id)
+                if not cash_account:
+                    raise StandartException(status_code=404, detail="cash account not found")
                 main_account_worth = await self.work_with_money.convert(base_currency="RUB",
                                                                         convert_currency=cash_account.currency,
                                                                         amount=cash_account.balance)

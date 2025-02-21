@@ -1,17 +1,32 @@
 from typing import  List, Optional
-
-from pydantic import BaseModel, Field
-
+from pydantic import BaseModel, Field, field_validator
+from core.redis_db.redis_helper import redis_client
 
 
 class UserCategoryPost(BaseModel):
     month_limit: float = Field(ge=0)
     name: str = Field(max_length=15)
+    currency: str = Field(max_length=3)
+
+    @field_validator("currency", mode="after")
+    def validate_currency(cls, value: str):
+        value = value.upper()
+        if not redis_client.exists(value):
+            raise ValueError(f"Currency '{value}' does not exist in Redis")
+        return value
 
 class UserCategoryPatch(BaseModel):
     category_id: Optional[int] = None
     month_limit: Optional[float] = Field(None, ge=0)
     name: Optional[str] = Field(None, max_length=15)
+    currency: Optional[str] = Field(None, max_length=3)
+
+    @field_validator("currency", mode="after")
+    def validate_currency(cls, value: str):
+        value = value.upper()
+        if not redis_client.exists(value):
+            raise ValueError(f"Currency '{value}' does not exist in Redis")
+        return value
 
 class UserCategoryGet(BaseModel):
     category_id: int
@@ -22,6 +37,7 @@ class UserCategoryRead(BaseModel):
     chat_id: int = Field(ge=10000000, le=10000000000)
     month_limit: float = Field(ge=0)
     name: str = Field(max_length=15)
+    currency: str = Field(max_length=3)
 
 class UserCategoriesRead(BaseModel):
     categories: List[UserCategoryRead]

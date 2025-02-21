@@ -28,6 +28,14 @@ class UserCashAccountPatch(BaseModel):
     cash_id: Optional[int] = None
     name: Optional[str] = Field(None, max_length=15)
     description: Optional[str] = Field(None, max_length=256)
+    currency: Optional[str] = Field(None, max_length=3)
+
+    @field_validator("currency", mode="after")
+    def validate_currency(cls, value: str):
+        value = value.upper()
+        if not redis_client.exists(value):
+            raise ValueError(f"Currency '{value}' does not exist in Redis")
+        return value
 
 class UserCashAccountGet(BaseModel):
     cash_id: int
@@ -46,11 +54,6 @@ class UserCashAccountRead(BaseModel):
         validate_assignment = True
         use_enum_values = True
 
-    @field_validator('type', mode='before')
-    def validate_type(cls, value):
-        if isinstance(value, CashAccountType):
-            return CashAccountType(value).value
-        return value
 
 
 class UserCashAccountsRead(BaseModel):
