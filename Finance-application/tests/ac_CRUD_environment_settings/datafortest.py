@@ -2,49 +2,57 @@ class DataForTestUserCategories:
     def __init__(self):
         self.input = {
             "month_limit": 1,
-            "name": "string"
+            "name": "string",
+            "currency": "USD"
         }
 
 
         self.wrong_limit = {
             "month_limit": -1,
-            "name": "string"
+            "name": "string",
+            "currency": "USD"
         }
 
         self.new_wrong_limit = {
             "category_id": 2,
             "month_limit": -1,
-            "name": "string"
+            "name": "string",
+            "currency": "USD"
         }
 
         self.new_wrong_id = {
             "category_id": 8,
             "month_limit": 1,
-            "name": "string"
+            "name": "string",
+            "currency": "USD"
         }
         self.new_id_2 = {
             "category_id": 2,
             "month_limit": 100,
-            "name": "string"
+            "name": "string",
+            "currency": "BYN"
         }
 
         self.new_id_4 = {
             "category_id": 4,
             "month_limit": 100,
-            "name": "string"
+            "name": "string",
+            "currency": "BYN"
         }
         self.for_test = {
             "category_id": 1,
             "chat_id": 9999999999,
             "month_limit": 1,
-            "name": "string"
+            "name": "string",
+            "currency": "USD"
         }
 
         self.for_test_patch = {
             "category_id": 1,
             "chat_id": 9999999999,
             "month_limit": 100,
-            "name": "string"
+            "name": "string",
+            "currency": "BYN"
         }
 
 class DataForTestCashAccounts:
@@ -79,17 +87,20 @@ class DataForTestCashAccounts:
             "name": "string",
             "description": "string",
             "type": "cash",
+            "currency": "BYN"
         }
         self.new_id_2 = {
             "cash_id": 2,
             "name": "stringn",
             "description": "stringn",
+            "currency": "BYN"
         }
 
         self.new_id_4 = {
             "cash_id": 4,
             "name": "stringn",
             "description": "stringn",
+            "currency": "BYN"
         }
         self.for_test = {
             "cash_id": 1,
@@ -108,7 +119,7 @@ class DataForTestCashAccounts:
             "name": "stringn",
             "description": "stringn",
             "type": "cash",
-            "currency": "USD"
+            "currency": "BYN"
         }
 
 
@@ -127,20 +138,23 @@ class DataForTestTypeEarnings:
     def __init__(self):
         self.input = {
             "name": "string",
-            "description": "string"
+            "description": "string",
+            "currency": "USD"
         }
 
 
         self.wrong_name = {
             "name": "stringeringqwertyui",
-            "description": "string"
+            "description": "string",
+            "currency": "USD"
         }
 
 
         self.new_wrong_name = {
             "earning_id": 2,
             "name": "stringeringqwertyui",
-            "description": "string"
+            "description": "string",
+            "currency": "USD"
         }
 
         self.new_wrong_id = {
@@ -151,24 +165,28 @@ class DataForTestTypeEarnings:
         self.new_id_2 = {
             "earning_id": 2,
             "name": "strin",
-            "description": "string1"
+            "description": "string1",
+            "currency": "BYN"
         }
 
         self.new_id_4 = {
             "earning_id": 4,
             "name": "strin",
-            "description": "string1"
+            "description": "string1",
+            "currency": "BYN"
         }
         self.for_test = {
             "earning_id": 1,
             "chat_id": 9999999999,
             "name": "string",
-            "description": "string"
+            "description": "string",
+            "currency": "USD"
         }
 
         self.for_test_patch = {
             "earning_id": 1,
             "chat_id": 9999999999,
             "name": "strin",
-            "description": "string1"
+            "description": "string1",
+            "currency": "BYN"
         }
