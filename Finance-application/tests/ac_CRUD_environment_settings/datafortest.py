@@ -14,33 +14,33 @@ class DataForTestUserCategories:
         }
 
         self.new_wrong_limit = {
-            "category_id": 2,
+            "table_id": 2,
             "month_limit": -1,
             "name": "string",
             "currency": "USD"
         }
 
         self.new_wrong_id = {
-            "category_id": 8,
+            "table_id": 8,
             "month_limit": 1,
             "name": "string",
             "currency": "USD"
         }
         self.new_id_2 = {
-            "category_id": 2,
+            "table_id": 2,
             "month_limit": 100,
             "name": "string",
             "currency": "BYN"
         }
 
         self.new_id_4 = {
-            "category_id": 4,
+            "table_id": 4,
             "month_limit": 100,
             "name": "string",
             "currency": "BYN"
         }
         self.for_test = {
-            "category_id": 1,
+            "table_id": 1,
             "chat_id": 9999999999,
             "month_limit": 1,
             "name": "string",
@@ -48,7 +48,7 @@ class DataForTestUserCategories:
         }
 
         self.for_test_patch = {
-            "category_id": 1,
+            "table_id": 1,
             "chat_id": 9999999999,
             "month_limit": 100,
             "name": "string",
@@ -83,27 +83,27 @@ class DataForTestCashAccounts:
         }
 
         self.new_wrong_id = {
-            "cash_id": -2,
+            "table_id": -2,
             "name": "string",
             "description": "string",
             "type": "cash",
             "currency": "BYN"
         }
         self.new_id_2 = {
-            "cash_id": 2,
+            "table_id": 2,
             "name": "stringn",
             "description": "stringn",
             "currency": "BYN"
         }
 
         self.new_id_4 = {
-            "cash_id": 4,
+            "table_id": 4,
             "name": "stringn",
             "description": "stringn",
             "currency": "BYN"
         }
         self.for_test = {
-            "cash_id": 1,
+            "table_id": 1,
             "balance": "10.00",
             "chat_id": 9999999999,
             "name": "string",
@@ -113,7 +113,7 @@ class DataForTestCashAccounts:
         }
 
         self.for_test_patch = {
-            "cash_id": 1,
+            "table_id": 1,
             "balance": "10.00",
             "chat_id": 9999999999,
             "name": "stringn",
@@ -151,32 +151,32 @@ class DataForTestTypeEarnings:
 
 
         self.new_wrong_name = {
-            "earning_id": 2,
+            "table_id": 2,
             "name": "stringeringqwertyui",
             "description": "string",
             "currency": "USD"
         }
 
         self.new_wrong_id = {
-            "earning_id": -2,
+            "table_id": -2,
             "name": "stringe",
             "description": "string"
         }
         self.new_id_2 = {
-            "earning_id": 2,
+            "table_id": 2,
             "name": "strin",
             "description": "string1",
             "currency": "BYN"
         }
 
         self.new_id_4 = {
-            "earning_id": 4,
+            "table_id": 4,
             "name": "strin",
             "description": "string1",
             "currency": "BYN"
         }
         self.for_test = {
-            "earning_id": 1,
+            "table_id": 1,
             "chat_id": 9999999999,
             "name": "string",
             "description": "string",
@@ -184,7 +184,7 @@ class DataForTestTypeEarnings:
         }
 
         self.for_test_patch = {
-            "earning_id": 1,
+            "table_id": 1,
             "chat_id": 9999999999,
             "name": "strin",
             "description": "string1",

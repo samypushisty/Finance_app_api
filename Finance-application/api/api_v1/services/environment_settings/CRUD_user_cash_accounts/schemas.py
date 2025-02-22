@@ -25,7 +25,7 @@ class UserCashAccountPost(BaseModel):
 
 
 class UserCashAccountPatch(BaseModel):
-    cash_id: Optional[int] = None
+    table_id: Optional[int] = None
     name: Optional[str] = Field(None, max_length=15)
     description: Optional[str] = Field(None, max_length=256)
     currency: Optional[str] = Field(None, max_length=3)
@@ -38,11 +38,11 @@ class UserCashAccountPatch(BaseModel):
         return value
 
 class UserCashAccountGet(BaseModel):
-    cash_id: int
+    table_id: int
 
 
 class UserCashAccountRead(BaseModel):
-    cash_id: int
+    table_id: int
     chat_id: int = Field(ge=10000000, le=10000000000)
     balance: Decimal = Field(gt=0, decimal_places=2)
     name: str = Field(max_length=15)

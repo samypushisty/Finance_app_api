@@ -40,7 +40,7 @@ def test_get_all(client,data_for_test):
     if response.status_code == 200:
         data = data_test.for_test
         for i in range(5):
-            data["cash_id"] = i+1
+            data["table_id"] = i+1
             assert answer["detail"]["accounts"][i] == data
 
 @pytest.mark.parametrize("data_for_test",
@@ -58,12 +58,12 @@ def test_patch(client,data_for_test):
     assert response.status_code == data_for_test.data.status_code
 
 @pytest.mark.parametrize("data_for_test",
-                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data={"cash_id": 1})),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=404,data={"cash_id": 1})),
-                          DataForFixture(id="www",data=DataDTO(status_code=401,data={"cash_id": 1}))],
+                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data={"table_id": 1})),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=404,data={"table_id": 1})),
+                          DataForFixture(id="www",data=DataDTO(status_code=401,data={"table_id": 1}))],
                          indirect=True, scope="function", ids=idfn)
 def test_delete(client,data_for_test):
-    response = client.delete("/api/v1/environment_settings/cash_accounts", params={"token": data_for_test.token, "cash_id": data_for_test.data.data["cash_id"]})
+    response = client.delete("/api/v1/environment_settings/cash_accounts", params={"token": data_for_test.token, "table_id": data_for_test.data.data["table_id"]})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -71,12 +71,12 @@ def test_delete(client,data_for_test):
     assert response.status_code == data_for_test.data.status_code
 
 @pytest.mark.parametrize("data_for_test",
-                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data={"cash_id": 3})),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=404,data={"cash_id": 3})),
-                          DataForFixture(id="www",data=DataDTO(status_code=401,data={"cash_id": 3}))],
+                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200,data={"table_id": 3})),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=404,data={"table_id": 3})),
+                          DataForFixture(id="www",data=DataDTO(status_code=401,data={"table_id": 3}))],
                          indirect=True, scope="function", ids=idfn)
 def test_get(client,data_for_test):
-    response = client.get("/api/v1/environment_settings/cash_accounts", params={"token": data_for_test.token, "cash_id": data_for_test.data.data["cash_id"]})
+    response = client.get("/api/v1/environment_settings/cash_accounts", params={"token": data_for_test.token, "table_id": data_for_test.data.data["table_id"]})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -84,7 +84,7 @@ def test_get(client,data_for_test):
     assert response.status_code == data_for_test.data.status_code
     if response.status_code == 200:
         data = data_test.for_test
-        data["cash_id"] = 3
+        data["table_id"] = 3
         assert answer["detail"] == data
 
 @pytest.mark.parametrize("data_for_test",
@@ -105,5 +105,5 @@ def test_get_all_patch(client,data_for_test):
                 data = data_test.for_test
             else:
                 data = data_test.for_test_patch
-            data["cash_id"] = i+2
+            data["table_id"] = i+2
             assert answer["detail"]["accounts"][i] == data

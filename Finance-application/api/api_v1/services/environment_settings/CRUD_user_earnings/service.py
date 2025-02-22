@@ -23,12 +23,12 @@ class UserEarningsService(UserEarningsServiceI):
         async with self.session() as session:
             async with session.begin():
                 await self.repository.patch(session=session, data=user_type_of_earnings.model_dump(exclude_unset=True),
-                                            chat_id=token.id, earning_id=user_type_of_earnings.earning_id)
+                                            chat_id=token.id, table_id=user_type_of_earnings.table_id)
 
 
     async def get_types_of_earnings(self, token: JwtInfo) -> GenericResponse[UserTypesEarningsRead]:
         async with self.session() as session:
-            result = await self.repository.find_all(session=session,order_column="earning_id",chat_id=token.id)
+            result = await self.repository.find_all(session=session,order_column="table_id",chat_id=token.id)
         if not result:
             raise StandartException(status_code=404, detail="types of earnings not found")
         result_types = UserTypesEarningsRead(types_of_earnings=[])
@@ -40,7 +40,7 @@ class UserEarningsService(UserEarningsServiceI):
     async def get_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsGet, token: JwtInfo) -> GenericResponse[UserTypeEarningsRead]:
         async with self.session() as session:
             result = await self.repository.find(session=session, chat_id=token.id,
-                            earning_id=user_type_of_earnings.earning_id)
+                            table_id=user_type_of_earnings.table_id)
         if not result:
             raise StandartException(status_code=404, detail="type of earnings not found")
         result = UserTypeEarningsRead.model_validate(result, from_attributes=True)
@@ -49,4 +49,4 @@ class UserEarningsService(UserEarningsServiceI):
     async def delete_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsGet, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.delete(session=session, chat_id=token.id,earning_id=user_type_of_earnings.earning_id)
+                await self.repository.delete(session=session, chat_id=token.id,table_id=user_type_of_earnings.table_id)

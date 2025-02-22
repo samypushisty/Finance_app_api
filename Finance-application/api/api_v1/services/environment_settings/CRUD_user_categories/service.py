@@ -24,12 +24,12 @@ class UserCategoriesService(UserCategoriesServiceI):
         async with self.session() as session:
             async with session.begin():
                 await self.repository.patch(session=session, data=user_category.model_dump(exclude_unset=True),
-                                            chat_id=token.id, category_id=user_category.category_id)
+                                            chat_id=token.id, table_id=user_category.table_id)
 
 
     async def get_user_categories(self, token: JwtInfo) -> GenericResponse[UserCategoriesRead]:
         async with self.session() as session:
-            result = await self.repository.find_all(session=session,order_column="category_id",chat_id=token.id)
+            result = await self.repository.find_all(session=session,order_column="table_id",chat_id=token.id)
         if not result:
             raise StandartException(status_code=404, detail="categories not found")
         result_categories = UserCategoriesRead(categories=[])
@@ -41,7 +41,7 @@ class UserCategoriesService(UserCategoriesServiceI):
     async def get_user_category(self,user_category: UserCategoryGet, token: JwtInfo) -> GenericResponse[UserCategoryRead]:
         async with self.session() as session:
             result = await self.repository.find(session=session, chat_id=token.id,
-                            category_id=user_category.category_id)
+                            table_id=user_category.table_id)
         if not result:
             raise StandartException(status_code=404, detail="category not found")
         result = UserCategoryRead.model_validate(result, from_attributes=True)
@@ -51,4 +51,4 @@ class UserCategoriesService(UserCategoriesServiceI):
     async def delete_user_category(self,user_category: UserCategoryGet, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.delete(session=session, chat_id=token.id,category_id=user_category.category_id)
+                await self.repository.delete(session=session, chat_id=token.id,table_id=user_category.table_id)

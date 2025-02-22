@@ -54,7 +54,7 @@ class User(Base):
 class CashAccount(Base):
     __tablename__ = "cash_account"
 
-    cash_id: Mapped[intpk]
+    table_id: Mapped[intpk]
     chat_id: Mapped[intfk]
     balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     name: Mapped[str_15]
@@ -65,7 +65,8 @@ class CashAccount(Base):
 
 class Category(Base):
     __tablename__ = "category"
-    category_id: Mapped[intpk]
+
+    table_id: Mapped[intpk]
     chat_id: Mapped[intfk]
     month_limit: Mapped[float]
     name: Mapped[str_15]
@@ -74,8 +75,9 @@ class Category(Base):
 
 class Earnings(Base):
     __tablename__ = "earnings"
+
+    table_id: Mapped[intpk]
     chat_id: Mapped[intfk]
-    earning_id: Mapped[intpk]
     name: Mapped[str_15]
     description: Mapped[str_256]
     balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
@@ -98,7 +100,7 @@ class UserSettings(Base):
 class MovieOnAccount(Base):
     __tablename__ = "movie_on_account"
 
-    movie_id: Mapped[intpk]
+    table_id: Mapped[intpk]
     chat_id: Mapped[intfk]
     title: Mapped[str_15]
     description: Mapped[Optional[str_256]]
@@ -107,14 +109,14 @@ class MovieOnAccount(Base):
     currency: Mapped[str_3]
     cash_account_worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     main_account_worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
-    cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.cash_id", ondelete="CASCADE"))
-    categories_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("category.category_id", ondelete="CASCADE"))
-    earnings_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("earnings.earning_id", ondelete="CASCADE"))
+    cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.table_id", ondelete="CASCADE"))
+    categories_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("category.table_id", ondelete="CASCADE"))
+    earnings_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("earnings.table_id", ondelete="CASCADE"))
     time: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
 
 
 class Balance(Base):
     __tablename__ = "balance"
     chat_id: Mapped[intfkpk]
-    total_balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
+    balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     balances_history: Mapped[str]

@@ -18,7 +18,7 @@ class UserTypeEarningsPost(BaseModel):
 
 
 class UserTypeEarningsPatch(BaseModel):
-    earning_id: Optional[int] = None
+    table_id: Optional[int] = None
     name: Optional[str] = Field(None, max_length=15)
     description: Optional[str] = Field(None, max_length=256)
     currency: Optional[str] = Field(None, max_length=3)
@@ -31,11 +31,11 @@ class UserTypeEarningsPatch(BaseModel):
         return value
 
 class UserTypeEarningsGet(BaseModel):
-    earning_id: int
+    table_id: int
 
 
 class UserTypeEarningsRead(BaseModel):
-    earning_id: int
+    table_id: int
     chat_id: int = Field(ge=10000000, le=10000000000)
     name: str = Field(max_length=15)
     description: str = Field(max_length=15)
