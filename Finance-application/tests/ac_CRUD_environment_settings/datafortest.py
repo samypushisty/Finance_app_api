@@ -44,7 +44,8 @@ class DataForTestUserCategories:
             "chat_id": 9999999999,
             "month_limit": 1,
             "name": "string",
-            "currency": "USD"
+            "currency": "USD",
+            "balance": "0.00"
         }
 
         self.for_test_patch = {
@@ -52,7 +53,8 @@ class DataForTestUserCategories:
             "chat_id": 9999999999,
             "month_limit": 100,
             "name": "string",
-            "currency": "BYN"
+            "currency": "BYN",
+            "balance": "0.00"
         }
 
 class DataForTestCashAccounts:
@@ -180,7 +182,8 @@ class DataForTestTypeEarnings:
             "chat_id": 9999999999,
             "name": "string",
             "description": "string",
-            "currency": "USD"
+            "currency": "USD",
+            "balance": "0.00"
         }
 
         self.for_test_patch = {
@@ -188,5 +191,6 @@ class DataForTestTypeEarnings:
             "chat_id": 9999999999,
             "name": "strin",
             "description": "string1",
-            "currency": "BYN"
+            "currency": "BYN",
+            "balance": "0.00"
         }

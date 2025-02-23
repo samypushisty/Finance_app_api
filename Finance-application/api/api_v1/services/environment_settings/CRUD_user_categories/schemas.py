@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import  List, Optional
 from pydantic import BaseModel, Field, field_validator
 from core.redis_db.redis_helper import redis_client
@@ -38,6 +39,7 @@ class UserCategoryRead(BaseModel):
     month_limit: float = Field(ge=0)
     name: str = Field(max_length=15)
     currency: str = Field(max_length=3)
+    balance: Decimal = Field(decimal_places=2)
 
 class UserCategoriesRead(BaseModel):
     categories: List[UserCategoryRead]

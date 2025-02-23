@@ -7,7 +7,7 @@ from core.redis_db.redis_helper import redis_client
 
 
 class UserCashAccountPost(BaseModel):
-    balance: Decimal = Field(gt=0, decimal_places=2)
+    balance: Decimal = Field(ge=0, decimal_places=2)
     name: str = Field(max_length=15)
     description: str = Field(max_length=256)
     type: CashAccountType
@@ -44,7 +44,7 @@ class UserCashAccountGet(BaseModel):
 class UserCashAccountRead(BaseModel):
     table_id: int
     chat_id: int = Field(ge=10000000, le=10000000000)
-    balance: Decimal = Field(gt=0, decimal_places=2)
+    balance: Decimal = Field(decimal_places=2)
     name: str = Field(max_length=15)
     description: str = Field(max_length=256)
     type: CashAccountType

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import List, Optional
 from core.redis_db.redis_helper import redis_client
 from pydantic import BaseModel, Field, field_validator
@@ -40,6 +41,7 @@ class UserTypeEarningsRead(BaseModel):
     name: str = Field(max_length=15)
     description: str = Field(max_length=15)
     currency: str = Field(max_length=3)
+    balance: Decimal = Field(decimal_places=2)
 
 
 class UserTypesEarningsRead(BaseModel):

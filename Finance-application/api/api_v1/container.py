@@ -30,10 +30,6 @@ class DependencyContainer(containers.DeclarativeContainer):
         max_overflow=settings.db.max_overflow,
     )
     database_session: Resource["AsyncGenerator[AsyncSession, None]"] = Resource(database_helper.provided.session_getter)
-    work_with_money_repository: Singleton["WorkWithMoneyRepository"] = Singleton(
-        WorkWithMoneyRepository,
-        db_redis = redis_session_getter
-    )
     categories_repository: Singleton["SQLAlchemyRepository"] = Singleton(
         SQLAlchemyRepository,
         model = Category,
@@ -64,6 +60,15 @@ class DependencyContainer(containers.DeclarativeContainer):
         model=Balance,
     )
 
+    work_with_money_repository: Singleton["WorkWithMoneyRepository"] = Singleton(
+        WorkWithMoneyRepository,
+        db_redis=redis_session_getter,
+        repository_cash_account=cash_account_repository,
+        repository_balance=balance_repository,
+        repository_categories=categories_repository,
+        repository_type_of_earnings=type_of_earnings_repository
+    )
+
     auth_service: Factory["AuthServiceI"] = Factory(AuthService,
                                                     repository_user=user_repository,
                                                     repository_settings=settings_repository,
@@ -89,8 +94,6 @@ class DependencyContainer(containers.DeclarativeContainer):
     user_movies_service: Factory["UserMovieServiceI"] = Factory(UserMovieService,
                                                                 work_with_money = work_with_money_repository,
                                                                 repository=movies_repository,
-                                                                repository_cash_account=cash_account_repository,
-                                                                repository_balance=balance_repository,
                                                                 database_session=database_session
                                                                 )
 

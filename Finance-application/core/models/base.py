@@ -107,8 +107,7 @@ class MovieOnAccount(Base):
     type: Mapped[MovieType]
     worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     currency: Mapped[str_3]
-    cash_account_worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
-    main_account_worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
+    base_worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.table_id", ondelete="CASCADE"))
     categories_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("category.table_id", ondelete="CASCADE"))
     earnings_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("earnings.table_id", ondelete="CASCADE"))
