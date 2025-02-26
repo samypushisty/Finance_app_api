@@ -79,7 +79,10 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                      database_session=database_session)
     user_categories_service: Factory["UserCategoriesServiceI"] = Factory(UserCategoriesService,
                                                                          repository=categories_repository,
-                                                                         database_session=database_session)
+                                                                         database_session=database_session,
+                                                                         movies_repository=movies_repository,
+                                                                         balance_repository=balance_repository,
+                                                                         cash_account_repository=cash_account_repository)
     user_cash_accounts_service: Factory["UserCashAccountsServiceI"] = Factory(UserCashAccountsService,
                                                                               work_with_money=work_with_money_repository,
                                                                               repository=cash_account_repository,
@@ -87,7 +90,10 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                               database_session=database_session)
     user_type_of_earnings_service: Factory["UserEarningsServiceI"] = Factory(UserEarningsService,
                                                                              repository=type_of_earnings_repository,
-                                                                             database_session=database_session)
+                                                                             database_session=database_session,
+                                                                             movies_repository=movies_repository,
+                                                                             balance_repository=balance_repository,
+                                                                             cash_account_repository=cash_account_repository)
     user_currency_service: Factory["UserCurrenciesServiceI"] = Factory(UserCurrenciesService,
                                                                        db_redis=redis_session_getter,
                                                                        database_session=database_session)

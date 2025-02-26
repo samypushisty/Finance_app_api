@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from decimal import Decimal
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 
@@ -22,6 +24,9 @@ class AbstractRepository(ABC):
     async def patch(self, session: AsyncSession, data: dict, **filters):
         ...
 
+    @abstractmethod
+    async def patch_field(self, session: AsyncSession, field: str, value: Decimal, **filters):
+        ...
     @abstractmethod
     async def delete(self, session: AsyncSession,**filters):
         ...
@@ -88,6 +93,25 @@ class SQLAlchemyRepository(AbstractRepository):
             raise StandartException(status_code=404, detail="not found")
         await session.flush()
 
+    async def patch_field(self, session: AsyncSession, field: str, value: Decimal, **filters):
+        print("patch")
+        print(session)
+        stmt = (
+            update(self.model)
+            .values({field : getattr(self.model, field) + value})
+            .filter_by(**filters)
+            .returning(getattr(self.model, field))
+        )
+        try:
+            result = await session.execute(stmt)
+        except:
+
+            raise StandartException(status_code=400, detail="Invalid data")
+        if result is None:
+            raise StandartException(status_code=404, detail="not found")
+        await session.flush()
+        print(result)
+        return result.scalars().first()
 
     async def delete(self, session: AsyncSession,**filters):
         print("delete")

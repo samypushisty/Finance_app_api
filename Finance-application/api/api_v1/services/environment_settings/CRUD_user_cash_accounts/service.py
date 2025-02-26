@@ -71,12 +71,8 @@ class UserCashAccountsService(UserCashAccountsServiceI):
                                                     table_id=user_cash_account.table_id)
                 if not cash_account:
                     raise StandartException(status_code=404, detail="cash account not found")
-                main_account_worth = await self.work_with_money.convert(base_currency="RUB",
-                                                                        convert_currency=cash_account.currency,
-                                                                        amount=cash_account.balance)
-                main_balance: Balance = await self.repository_balance.find(session=session, chat_id=token.id)
-                balance = main_balance.balance - main_account_worth
-                await self.repository_balance.patch(session=session,
-                                                    data={"balance": balance},
-                                                    chat_id=token.id)
+                await self.repository_balance.patch_field(session=session,
+                                                          field="balance",
+                                                          value=-cash_account.balance,
+                                                          chat_id=token.id)
                 await self.repository.delete(session=session, chat_id=token.id, table_id=user_cash_account.table_id)
