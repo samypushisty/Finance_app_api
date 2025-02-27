@@ -78,6 +78,7 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                      repository=settings_repository,
                                                                      database_session=database_session)
     user_categories_service: Factory["UserCategoriesServiceI"] = Factory(UserCategoriesService,
+                                                                         work_with_money=work_with_money_repository,
                                                                          repository=categories_repository,
                                                                          database_session=database_session,
                                                                          movies_repository=movies_repository,
@@ -87,8 +88,10 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                               work_with_money=work_with_money_repository,
                                                                               repository=cash_account_repository,
                                                                               repository_balance=balance_repository,
+                                                                              repository_settings=settings_repository,
                                                                               database_session=database_session)
     user_type_of_earnings_service: Factory["UserEarningsServiceI"] = Factory(UserEarningsService,
+                                                                             work_with_money=work_with_money_repository,
                                                                              repository=type_of_earnings_repository,
                                                                              database_session=database_session,
                                                                              movies_repository=movies_repository,

@@ -5,17 +5,19 @@ from api.api_v1.services.environment_settings.CRUD_user_categories.schemas impor
     UserCategoryPatch, UserCategoriesRead, UserCategoryRead, UserCategoryGet
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
+from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
 from secure import JwtInfo
 from typing import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UserCategoriesService(UserCategoriesServiceI):
-    def __init__(self, repository: SQLAlchemyRepository, movies_repository: SQLAlchemyRepository,cash_account_repository: SQLAlchemyRepository, balance_repository: SQLAlchemyRepository, database_session:Callable[..., AsyncSession]) -> None:
+    def __init__(self,work_with_money: WorkWithMoneyRepository, repository: SQLAlchemyRepository, movies_repository: SQLAlchemyRepository,cash_account_repository: SQLAlchemyRepository, balance_repository: SQLAlchemyRepository, database_session:Callable[..., AsyncSession]) -> None:
         self.repository = repository
         self.repository_movies = movies_repository
         self.repository_cash_account = cash_account_repository
         self.repository_balance = balance_repository
+        self.work_with_money = work_with_money
         self.session = database_session
 
     async def post_user_category(self, user_category: UserCategoryPost,
@@ -40,7 +42,11 @@ class UserCategoriesService(UserCategoriesServiceI):
             raise StandartException(status_code=404, detail="categories not found")
         result_categories = UserCategoriesRead(categories=[])
         for i in result:
-            result_categories.categories.append(UserCategoryRead.model_validate(i, from_attributes=True))
+            data = UserCategoryRead.model_validate(i, from_attributes=True)
+            data.balance = await self.work_with_money.convert(base_currency=data.currency,
+                                                              convert_currency="RUB",
+                                                              amount=data.balance)
+            result_categories.categories.append(data)
         return GenericResponse[UserCategoriesRead](detail=result_categories)
 
 
@@ -51,6 +57,9 @@ class UserCategoriesService(UserCategoriesServiceI):
         if not result:
             raise StandartException(status_code=404, detail="category not found")
         result = UserCategoryRead.model_validate(result, from_attributes=True)
+        result.balance = await self.work_with_money.convert(base_currency=result.currency,
+                                                            convert_currency="RUB",
+                                                            amount=result.balance)
         return GenericResponse[UserCategoryRead](detail=result)
 
 

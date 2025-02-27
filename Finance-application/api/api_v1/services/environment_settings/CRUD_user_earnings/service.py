@@ -5,18 +5,20 @@ from api.api_v1.services.environment_settings.CRUD_user_earnings.schemas import 
     UserTypeEarningsPatch, UserTypesEarningsRead, UserTypeEarningsRead, UserTypeEarningsGet
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
+from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
 from secure import JwtInfo
 from typing import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UserEarningsService(UserEarningsServiceI):
-    def __init__(self, repository: SQLAlchemyRepository, movies_repository: SQLAlchemyRepository, balance_repository: SQLAlchemyRepository,cash_account_repository: SQLAlchemyRepository, database_session:Callable[..., AsyncSession]) -> None:
+    def __init__(self,work_with_money: WorkWithMoneyRepository, repository: SQLAlchemyRepository, movies_repository: SQLAlchemyRepository, balance_repository: SQLAlchemyRepository,cash_account_repository: SQLAlchemyRepository, database_session:Callable[..., AsyncSession]) -> None:
         self.repository = repository
         self.repository_movies = movies_repository
         self.session = database_session
         self.repository_cash_account = cash_account_repository
         self.repository_balance = balance_repository
+        self.work_with_money = work_with_money
 
     async def post_user_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsPost, token: JwtInfo) -> None:
         async with self.session() as session:
@@ -38,7 +40,12 @@ class UserEarningsService(UserEarningsServiceI):
             raise StandartException(status_code=404, detail="types of earnings not found")
         result_types = UserTypesEarningsRead(types_of_earnings=[])
         for i in result:
-            result_types.types_of_earnings.append(UserTypeEarningsRead.model_validate(i, from_attributes=True))
+
+            data = UserTypeEarningsRead.model_validate(i, from_attributes=True)
+            data.balance = await self.work_with_money.convert(base_currency=data.currency,
+                                                              convert_currency="RUB",
+                                                              amount=data.balance)
+            result_types.types_of_earnings.append(data)
         return GenericResponse[UserTypesEarningsRead](detail=result_types)
 
 
@@ -49,6 +56,9 @@ class UserEarningsService(UserEarningsServiceI):
         if not result:
             raise StandartException(status_code=404, detail="type of earnings not found")
         result = UserTypeEarningsRead.model_validate(result, from_attributes=True)
+        result.balance = await self.work_with_money.convert(base_currency=result.currency,
+                                                            convert_currency="RUB",
+                                                            amount=result.balance)
         return GenericResponse[UserTypeEarningsRead](detail=result)
 
     async def delete_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsGet, token: JwtInfo) -> None:

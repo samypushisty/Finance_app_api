@@ -19,7 +19,7 @@ async def post_category(
         token: JwtInfo = Depends(validation),
         user_cash_account_service = Depends(get_user_cash_accounts_service),
         ):
-    await user_cash_account_service.post_user_category(user_cash_account=user_cash_account,token=token)
+    await user_cash_account_service.post_user_cash_account(user_cash_account=user_cash_account,token=token)
 
 
 @router.patch("")
@@ -28,14 +28,14 @@ async def patch_category(
         token: JwtInfo = Depends(validation),
         user_cash_account_service = Depends(get_user_cash_accounts_service),
         ):
-    await user_cash_account_service.patch_user_category(user_cash_account=user_cash_account,token=token)
+    await user_cash_account_service.patch_user_cash_account(user_cash_account=user_cash_account,token=token)
 
 @router.get("/all",response_model=GenericResponse[UserCashAccountsRead])
 async def get_categories(
         token: JwtInfo = Depends(validation),
         user_cash_account_service = Depends(get_user_cash_accounts_service),
         ):
-    return await user_cash_account_service.get_user_categories(token=token)
+    return await user_cash_account_service.get_user_cash_accounts(token=token)
 
 
 @router.get("",response_model=GenericResponse[UserCashAccountRead])
@@ -44,7 +44,7 @@ async def get_category(
         token: JwtInfo = Depends(validation),
         user_cash_account_service = Depends(get_user_cash_accounts_service),
         ):
-    return await user_cash_account_service.get_user_category(user_cash_account=user_cash_account, token=token)
+    return await user_cash_account_service.get_user_cash_account(user_cash_account=user_cash_account, token=token)
 
 @router.delete("")
 async def delete_category(
@@ -52,4 +52,4 @@ async def delete_category(
         token: JwtInfo = Depends(validation),
         user_cash_account_service = Depends(get_user_cash_accounts_service),
         ):
-    await user_cash_account_service.delete_user_category(user_cash_account=user_cash_account,token=token)
+    await user_cash_account_service.delete_user_cash_account(user_cash_account=user_cash_account,token=token)
