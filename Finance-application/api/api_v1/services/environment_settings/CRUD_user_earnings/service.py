@@ -55,6 +55,8 @@ class UserEarningsService(UserEarningsServiceI):
                             table_id=user_type_of_earnings.table_id)
         if not result:
             raise StandartException(status_code=404, detail="type of earnings not found")
+        if user_type_of_earnings.currency:
+            result.currency = user_type_of_earnings.currency
         result = UserTypeEarningsRead.model_validate(result, from_attributes=True)
         result.balance = await self.work_with_money.convert(base_currency=result.currency,
                                                             convert_currency="RUB",

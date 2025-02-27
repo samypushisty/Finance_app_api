@@ -1,5 +1,7 @@
 from decimal import Decimal
 from typing import List, Optional
+
+from api.api_v1.services.base_schemas.schemas import StandartException
 from core.redis_db.redis_helper import redis_client
 from pydantic import BaseModel, Field, field_validator
 
@@ -33,6 +35,16 @@ class UserTypeEarningsPatch(BaseModel):
 
 class UserTypeEarningsGet(BaseModel):
     table_id: int
+    currency: Optional[str] = Field(None, max_length=3)
+
+    @field_validator("currency", mode="after")
+    def validate_currency(cls, value: str):
+        if value is None:
+            return value
+        value = value.upper()
+        if not redis_client.exists(value):
+            raise StandartException(status_code=401, detail=f"Currency '{value}' does not exist in Redis")
+        return value
 
 
 class UserTypeEarningsRead(BaseModel):

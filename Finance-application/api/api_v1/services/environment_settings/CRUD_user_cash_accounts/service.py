@@ -66,9 +66,10 @@ class UserCashAccountsService(UserCashAccountsServiceI):
                                             table_id=user_cash_account.table_id)
         if not result:
             raise StandartException(status_code=404, detail="cash account not found")
+        if user_cash_account.currency:
+            result.currency = user_cash_account.currency
         result = UserCashAccountRead.model_validate(result, from_attributes=True)
-
-        result.balance = await self.work_with_money.convert(base_currency=result.main_currency,
+        result.balance = await self.work_with_money.convert(base_currency=result.currency,
                                                        convert_currency="RUB",
                                                        amount=result.balance)
         return GenericResponse[UserCashAccountRead](detail=result)

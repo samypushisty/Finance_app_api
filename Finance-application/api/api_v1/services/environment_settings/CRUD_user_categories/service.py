@@ -56,6 +56,8 @@ class UserCategoriesService(UserCategoriesServiceI):
                             table_id=user_category.table_id)
         if not result:
             raise StandartException(status_code=404, detail="category not found")
+        if user_category.currency:
+            result.currency = user_category.currency
         result = UserCategoryRead.model_validate(result, from_attributes=True)
         result.balance = await self.work_with_money.convert(base_currency=result.currency,
                                                             convert_currency="RUB",
