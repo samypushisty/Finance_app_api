@@ -41,6 +41,7 @@ class DataForTestUserCategories:
         }
         self.for_test = {
             "table_id": 1,
+            # убрать в конце
             "chat_id": 9999999999,
             "month_limit": 1,
             "name": "string",
@@ -50,6 +51,7 @@ class DataForTestUserCategories:
 
         self.for_test_patch = {
             "table_id": 1,
+            # убрать в конце
             "chat_id": 9999999999,
             "month_limit": 100,
             "name": "string",
@@ -107,6 +109,7 @@ class DataForTestCashAccounts:
         self.for_test = {
             "table_id": 1,
             "balance": "10.00",
+            # убрать в конце
             "chat_id": 9999999999,
             "name": "string",
             "description": "string",
@@ -117,6 +120,7 @@ class DataForTestCashAccounts:
         self.for_test_patch = {
             "table_id": 1,
             "balance": "33.90",
+            # убрать в конце
             "chat_id": 9999999999,
             "name": "stringn",
             "description": "stringn",
@@ -179,6 +183,7 @@ class DataForTestTypeEarnings:
         }
         self.for_test = {
             "table_id": 1,
+            # убрать в конце
             "chat_id": 9999999999,
             "name": "string",
             "description": "string",
@@ -188,6 +193,7 @@ class DataForTestTypeEarnings:
 
         self.for_test_patch = {
             "table_id": 1,
+            # убрать в конце
             "chat_id": 9999999999,
             "name": "strin",
             "description": "string1",

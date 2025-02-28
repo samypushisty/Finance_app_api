@@ -5,6 +5,3 @@ class UserAuth(BaseModel):
 
 class JWTRead(BaseModel):
     jwt: str
-
-class UserRegistration(BaseModel):
-    chat_id: int = Field(ge=10000000, le=10000000000)

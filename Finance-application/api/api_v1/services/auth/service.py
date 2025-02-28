@@ -1,5 +1,5 @@
 from api.api_v1.utils.repository import SQLAlchemyRepository
-from api.api_v1.services.auth.schemas import UserAuth, UserRegistration, JWTRead
+from api.api_v1.services.auth.schemas import UserAuth, JWTRead
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 from secure import create_jwt
 from datetime import datetime, timezone
@@ -21,11 +21,10 @@ class AuthService(AuthServiceI):
             async with session.begin():
                 result = await self.repository_user.find(session=session, chat_id=user.chat_id)
                 if not result:
-                    user_registration = UserRegistration(chat_id=user.chat_id)
                     user_settings = {"chat_id": user.chat_id, "theme": "auto", "language": "english",
                                      "notifications": True, "main_currency": "USD"}
                     user_balance = {"chat_id": user.chat_id, "balance": 0, "balances_history": ""}
-                    await self.repository_user.add(session=session, data=user_registration.model_dump())
+                    await self.repository_user.add(session=session, data=user.model_dump())
                     await self.repository_balance.add(session=session, data=user_balance)
                     await self.repository_settings.add(session=session, data=user_settings)
 
