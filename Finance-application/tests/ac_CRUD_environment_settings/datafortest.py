@@ -116,7 +116,7 @@ class DataForTestCashAccounts:
 
         self.for_test_patch = {
             "table_id": 1,
-            "balance": "10.00",
+            "balance": "33.90",
             "chat_id": 9999999999,
             "name": "stringn",
             "description": "stringn",

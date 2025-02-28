@@ -27,6 +27,10 @@ class UserCashAccountsService(UserCashAccountsServiceI):
         token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
+                main_account_worth = await self.work_with_money.convert(base_currency="RUB",
+                                                                        convert_currency=user_cash_account.currency,
+                                                                        amount=user_cash_account.balance)
+                user_cash_account.balance = main_account_worth
                 await self.repository.add(session=session,data={"chat_id": token.id, **user_cash_account.model_dump()})
                 main_balance: Balance = await self.repository_balance.find(session=session, chat_id=token.id)
                 main_account_worth = await self.work_with_money.convert(base_currency="RUB",
