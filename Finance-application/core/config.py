@@ -19,6 +19,7 @@ class ApiV1Prefix(BaseModel):
     auth: str = "/auth"
     settings: str = "/settings"
     movies: str = "/movies"
+    total_balance: str = "/total_balance"
     environment_settings: str = "/environment_settings"
 
 

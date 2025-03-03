@@ -1,20 +1,20 @@
 from dependency_injector import containers
 from dependency_injector.providers import Singleton, Factory, Resource
 
-from api.api_v1.services.CRUD_Movie_on_account.service import UserMovieService, UserMovieServiceI
-from api.api_v1.services.environment_settings.CRUD_user_earnings.service import UserEarningsService, UserEarningsServiceI
-from api.api_v1.services.environment_settings.currencies.service import UserCurrenciesService, UserCurrenciesServiceI
-from api.api_v1.services.user_settings.interface import UserSettingsServiceI
+from api.api_v1.services.CRUD_Movie_on_account import UserMovieService,UserMovieServiceI
+from api.api_v1.services.environment_settings.CRUD_user_earnings import UserEarningsService, UserEarningsServiceI
+from api.api_v1.services.environment_settings.currencies import UserCurrenciesService, UserCurrenciesServiceI
+from api.api_v1.services.total_balance import UserBalanceService, UserBalanceServiceI
+from api.api_v1.services.user_settings import UserSettingsService, UserSettingsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_categories import UserCategoriesServiceI, UserCategoriesService
 from api.api_v1.services.environment_settings.CRUD_user_cash_accounts import UserCashAccountsService,UserCashAccountsServiceI
-from api.api_v1.services.user_settings.service import UserSettingsService
+from api.api_v1.services.auth import AuthService, AuthServiceI
+
 from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from core.config import settings
 from sqlalchemy.ext.asyncio import AsyncSession
 from collections.abc import AsyncGenerator
-from api.api_v1.services.auth.interface import AuthServiceI
-from api.api_v1.services.auth.service import AuthService
 from core.models.base import Category, CashAccount, UserSettings, User, Earnings, MovieOnAccount, Balance
 from core.models.db_helper import DatabaseHelper
 from core.redis_db.redis_helper import redis_session_getter
@@ -104,6 +104,10 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                 work_with_money = work_with_money_repository,
                                                                 repository=movies_repository,
                                                                 database_session=database_session
+                                                                )
+    user_total_balance_service: Factory["UserBalanceServiceI"] = Factory(UserBalanceService,
+                                                                 database_session=database_session,
+                                                                 repository_balance=balance_repository
                                                                 )
 
 container = DependencyContainer()

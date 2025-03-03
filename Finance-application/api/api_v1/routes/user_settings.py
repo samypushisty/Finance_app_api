@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from api.api_v1.services.user_settings.interface import UserSettingsServiceI
+from api.api_v1.services.user_settings import UserSettingsServiceI
 from api.api_v1.container import container
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 from api.api_v1.services.user_settings.schemas import UserSettingsPatch, UserSettingsRead

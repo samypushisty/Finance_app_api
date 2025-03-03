@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from api.api_v1.services.CRUD_Movie_on_account.interface import UserMovieServiceI
+from api.api_v1.services.CRUD_Movie_on_account import UserMovieServiceI
 from api.api_v1.services.CRUD_Movie_on_account.schemas import UserMoviePost, UserMovieGet, UserMovieRead, \
     UserMoviesRead, UserMoviePatch
 from api.api_v1.container import container
