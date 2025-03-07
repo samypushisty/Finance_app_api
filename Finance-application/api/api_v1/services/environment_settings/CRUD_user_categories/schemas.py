@@ -19,7 +19,7 @@ class UserCategoryPost(BaseModel):
         return value
 
 class UserCategoryPatch(BaseModel):
-    table_id: Optional[int] = None
+    table_id: int
     month_limit: Optional[float] = Field(None, ge=0)
     name: Optional[str] = Field(None, max_length=15)
     currency: Optional[str] = Field(None, max_length=3)

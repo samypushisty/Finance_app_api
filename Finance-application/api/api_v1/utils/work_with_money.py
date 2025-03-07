@@ -86,7 +86,6 @@ class WorkWithMoneyRepository(AbstractConverter):
                                                                                   table_id=cash_id)
             balance_main_account = await self.repository_balance.patch_field(session=session, field="balance",
                                                                              value=-amount,chat_id=chat_id)
-            print(balance_cash_account, balance_main_account,"eihijwokodownfonwofwoqpodm", sep="/n")
             if balance_cash_account < 0 or balance_main_account < 0:
                 raise StandartException(status_code=403, detail="balance < 0")
         elif type_operation == "earning":

@@ -21,7 +21,7 @@ class UserTypeEarningsPost(BaseModel):
 
 
 class UserTypeEarningsPatch(BaseModel):
-    table_id: Optional[int] = None
+    table_id: int
     name: Optional[str] = Field(None, max_length=15)
     description: Optional[str] = Field(None, max_length=256)
     currency: Optional[str] = Field(None, max_length=3)

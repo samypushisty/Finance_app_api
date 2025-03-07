@@ -32,14 +32,8 @@ class UserCashAccountsService(UserCashAccountsServiceI):
                                                                         amount=user_cash_account.balance)
                 user_cash_account.balance = main_account_worth
                 await self.repository.add(session=session,data={"chat_id": token.id, **user_cash_account.model_dump()})
-                main_balance: Balance = await self.repository_balance.find(session=session, chat_id=token.id)
-                main_account_worth = await self.work_with_money.convert(base_currency="RUB",
-                                                                        convert_currency=user_cash_account.currency,
-                                                                        amount=user_cash_account.balance)
-                balance = main_balance.balance + main_account_worth
-                await self.repository_balance.patch(session=session,
-                                                    data={"balance": balance},
-                                                    chat_id=token.id)
+                await self.repository_balance.patch_field(session=session,field="balance",value=main_account_worth, chat_id=token.id)
+
 
 
     async def patch_user_cash_account(self, user_cash_account: UserCashAccountPatch, token: JwtInfo) -> None:
@@ -51,9 +45,7 @@ class UserCashAccountsService(UserCashAccountsServiceI):
 
     async def get_user_cash_accounts(self, token: JwtInfo) -> GenericResponse[UserCashAccountsRead]:
         async with self.session() as session:
-            result = await self.repository.find_all(session=session,order_column="table_id", chat_id=token.id)
-        if not result:
-            raise StandartException(status_code=404, detail="cash account not found")
+            result = await self.repository.find_all(session=session, validate=True, order_column="table_id", chat_id=token.id)
         result_accounts = UserCashAccountsRead(accounts=[])
         for i in result:
             data = UserCashAccountRead.model_validate(i, from_attributes=True)
@@ -66,10 +58,8 @@ class UserCashAccountsService(UserCashAccountsServiceI):
 
     async def get_user_cash_account(self,user_cash_account: UserCashAccountGet, token: JwtInfo) -> GenericResponse[UserCashAccountRead]:
         async with self.session() as session:
-            result = await self.repository.find(session=session, chat_id=token.id,
-                                            table_id=user_cash_account.table_id)
-        if not result:
-            raise StandartException(status_code=404, detail="cash account not found")
+            result = await self.repository.find(session=session, validate=True,
+                                                chat_id=token.id, table_id=user_cash_account.table_id)
         if user_cash_account.currency:
             result.currency = user_cash_account.currency
         result = UserCashAccountRead.model_validate(result, from_attributes=True)
@@ -82,12 +72,10 @@ class UserCashAccountsService(UserCashAccountsServiceI):
     async def delete_user_cash_account(self,user_cash_account: UserCashAccountGet, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                cash_account = await self.repository.find(session=session, chat_id=token.id,
-                                                    table_id=user_cash_account.table_id)
-                if not cash_account:
-                    raise StandartException(status_code=404, detail="cash account not found")
+                cash_account = await self.repository.find(session=session, validate=True,
+                                                          chat_id=token.id, table_id=user_cash_account.table_id)
+                await self.repository.delete(session=session, chat_id=token.id, table_id=user_cash_account.table_id)
                 await self.repository_balance.patch_field(session=session,
                                                           field="balance",
                                                           value=-cash_account.balance,
                                                           chat_id=token.id)
-                await self.repository.delete(session=session, chat_id=token.id, table_id=user_cash_account.table_id)

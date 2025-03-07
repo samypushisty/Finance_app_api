@@ -35,9 +35,7 @@ class UserEarningsService(UserEarningsServiceI):
 
     async def get_types_of_earnings(self, token: JwtInfo) -> GenericResponse[UserTypesEarningsRead]:
         async with self.session() as session:
-            result = await self.repository.find_all(session=session,order_column="table_id",chat_id=token.id)
-        if not result:
-            raise StandartException(status_code=404, detail="types of earnings not found")
+            result = await self.repository.find_all(session=session, validate=True,order_column="table_id",chat_id=token.id)
         result_types = UserTypesEarningsRead(types_of_earnings=[])
         for i in result:
 
@@ -51,10 +49,8 @@ class UserEarningsService(UserEarningsServiceI):
 
     async def get_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsGet, token: JwtInfo) -> GenericResponse[UserTypeEarningsRead]:
         async with self.session() as session:
-            result = await self.repository.find(session=session, chat_id=token.id,
-                            table_id=user_type_of_earnings.table_id)
-        if not result:
-            raise StandartException(status_code=404, detail="type of earnings not found")
+            result = await self.repository.find(session=session, validate=True,
+                                                chat_id=token.id, table_id=user_type_of_earnings.table_id)
         if user_type_of_earnings.currency:
             result.currency = user_type_of_earnings.currency
         result = UserTypeEarningsRead.model_validate(result, from_attributes=True)

@@ -51,7 +51,7 @@ class UserMoviePatch(BaseModel):
         return value
 
 class UserMovieGet(BaseModel):
-    movie_id: int
+    table_id: int
 
 
 class UserMovieRead(BaseModel):

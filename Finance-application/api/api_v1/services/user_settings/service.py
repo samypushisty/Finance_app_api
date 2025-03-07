@@ -21,8 +21,7 @@ class UserSettingsService(UserSettingsServiceI):
 
     async def get_settings(self, token: JwtInfo) -> GenericResponse[UserSettingsRead]:
         async with self.session() as session:
-            result = await self.repository.find(session=session, chat_id=token.id)
-        if not result:
-            raise StandartException(status_code=404, detail="user not found")
+            result = await self.repository.find(session=session, validate=True,
+                                                chat_id=token.id)
         result = UserSettingsRead.model_validate(result,from_attributes=True)
         return GenericResponse[UserSettingsRead](detail=result)

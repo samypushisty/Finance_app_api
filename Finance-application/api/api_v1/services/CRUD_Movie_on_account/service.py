@@ -20,11 +20,12 @@ class UserMovieService(UserMovieServiceI):
 
 
     async def post_movie(self, user_movie: UserMoviePost, token: JwtInfo) -> None:
+        worth = await self.work_with_money.convert(base_currency="RUB",
+                                                   convert_currency=user_movie.currency,
+                                                   amount=user_movie.worth)
         async with self.session() as session:
             async with session.begin():
-                worth = await self.work_with_money.convert(base_currency="RUB",
-                                                             convert_currency=user_movie.currency,
-                                                             amount=user_movie.worth)
+
                 # добавление операции
                 await self.repository.add(session=session, data={"chat_id": token.id, "base_worth": worth,
                                                                  **user_movie.model_dump()})
@@ -45,8 +46,8 @@ class UserMovieService(UserMovieServiceI):
                 patch_data = user_movie.model_dump(exclude_unset=True)
                 if user_movie.worth or user_movie.currency:
                     # получение информации
-                    old_movie: MovieOnAccount = await self.repository.find(session=session, chat_id=token.id,
-                                                                           table_id=user_movie.table_id)
+                    old_movie: MovieOnAccount = await self.repository.find(session=session, validate=True,
+                                                                           chat_id=token.id, table_id=user_movie.table_id)
 
                     # полуение валют
                     if not user_movie.currency:
@@ -64,7 +65,6 @@ class UserMovieService(UserMovieServiceI):
                     new_worth = await self.work_with_money.convert(base_currency="RUB",
                                                                        convert_currency=movie_currency,
                                                                        amount=movie_worth)
-                    print("old:", old_movie.base_worth,"new", new_worth)
                     # изменение баланса
                     await self.work_with_money.edit_transaction(session=session,
                                                                 chat_id=token.id,
@@ -83,9 +83,7 @@ class UserMovieService(UserMovieServiceI):
     async def get_movies(self, token: JwtInfo) -> GenericResponse[UserMoviesRead]:
         async with self.session() as session:
             async with session.begin():
-                result = await self.repository.find_all(session=session, order_column="table_id",chat_id=token.id)
-        if not result:
-            raise StandartException(status_code=404, detail="movie not found")
+                result = await self.repository.find_all(session=session, validate=True, order_column="table_id",chat_id=token.id)
         result_movies = UserMoviesRead(movies=[])
         for i in result:
             result_movies.movies.append(UserMovieRead.model_validate(i, from_attributes=True))
@@ -94,10 +92,8 @@ class UserMovieService(UserMovieServiceI):
 
     async def get_movie(self, user_movie: UserMovieGet, token: JwtInfo) -> GenericResponse[UserMovieRead]:
         async with self.session() as session:
-            result = await self.repository.find(session=session, chat_id=token.id,
-                            movie_id=user_movie.movie_id)
-        if not result:
-            raise StandartException(status_code=404, detail="movie not found")
+            result = await self.repository.find(session=session, validate=True, chat_id=token.id,
+                            table_id=user_movie.table_id)
         result = UserMovieRead.model_validate(result, from_attributes=True)
         return GenericResponse[UserMovieRead](detail=result)
 
@@ -105,8 +101,10 @@ class UserMovieService(UserMovieServiceI):
         async with self.session() as session:
             async with session.begin():
                 # получение нужных таблиц
-                old_movie: MovieOnAccount = await self.repository.find(session=session, chat_id=token.id,
-                                                                       movie_id=user_movie.movie_id)
+                old_movie: MovieOnAccount = await self.repository.find(session=session, validate=True,
+                                                                       chat_id=token.id, table_id=user_movie.table_id)
+                # удаление транзакции
+                await self.repository.delete(session=session, chat_id=token.id, table_id=user_movie.table_id)
                 # изменение баланса
                 await self.work_with_money.delete_transaction(session=session,
                                                               chat_id=token.id,
@@ -115,5 +113,3 @@ class UserMovieService(UserMovieServiceI):
                                                               earning_id=old_movie.earnings_id,
                                                               type_operation=old_movie.type.value,
                                                               amount=old_movie.base_worth)
-                # удаление транзакции
-                await self.repository.delete(session=session,chat_id=token.id,movie_id=user_movie.movie_id)

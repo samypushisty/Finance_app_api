@@ -37,9 +37,7 @@ class UserCategoriesService(UserCategoriesServiceI):
 
     async def get_user_categories(self, token: JwtInfo) -> GenericResponse[UserCategoriesRead]:
         async with self.session() as session:
-            result = await self.repository.find_all(session=session,order_column="table_id",chat_id=token.id)
-        if not result:
-            raise StandartException(status_code=404, detail="categories not found")
+            result = await self.repository.find_all(session=session, validate=True, order_column="table_id",chat_id=token.id)
         result_categories = UserCategoriesRead(categories=[])
         for i in result:
             data = UserCategoryRead.model_validate(i, from_attributes=True)
@@ -52,10 +50,8 @@ class UserCategoriesService(UserCategoriesServiceI):
 
     async def get_user_category(self,user_category: UserCategoryGet, token: JwtInfo) -> GenericResponse[UserCategoryRead]:
         async with self.session() as session:
-            result = await self.repository.find(session=session, chat_id=token.id,
-                            table_id=user_category.table_id)
-        if not result:
-            raise StandartException(status_code=404, detail="category not found")
+            result = await self.repository.find(session=session, validate=True,
+                                                chat_id=token.id, table_id=user_category.table_id)
         if user_category.currency:
             result.currency = user_category.currency
         result = UserCategoryRead.model_validate(result, from_attributes=True)
