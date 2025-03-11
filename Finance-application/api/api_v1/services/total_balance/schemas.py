@@ -10,4 +10,4 @@ class BalanceRead(BaseModel):
 
 
 class BalancesHistoryRead(BaseModel):
-    balances_history: str
+    balances_history: list

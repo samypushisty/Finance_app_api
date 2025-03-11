@@ -106,6 +106,7 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                 database_session=database_session
                                                                 )
     user_total_balance_service: Factory["UserBalanceServiceI"] = Factory(UserBalanceService,
+                                                                         db_redis=redis_session_getter,
                                                                          work_with_money=work_with_money_repository,
                                                                          database_session=database_session,
                                                                          repository_balance=balance_repository,
