@@ -58,6 +58,8 @@ def test_get_all(client,data_for_test):
 def test_balance(client,data_for_test):
     response = client.get("/api/v1/total_balance", params={"token": data_for_test.token})
     answer = json.loads(response.text)
+    response = client.get("/api/v1/total_balance", params={"token": data_for_test.token,"currency":"USD"})
+    answer_balance_currency = json.loads(response.text)
     response = client.get("/api/v1/environment_settings/cash_accounts", params={"token": data_for_test.token, "table_id":2})
     answer_cash_account = json.loads(response.text)
     print(answer_cash_account)
@@ -72,6 +74,7 @@ def test_balance(client,data_for_test):
     price_convert = Decimal(redis_client.get("USD"))
 
     assert answer["detail"]["balance"] == str((Decimal("1840.00") / price_convert * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
+    assert answer_balance_currency["detail"]["balance"] == "1840.00"
     assert answer_cash_account["detail"]["balance"] == str((Decimal("910.00") / price_convert * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
     assert answer_earnings["detail"]["balance"] == str((Decimal("1000.00") / price_convert * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
     assert answer_outlays["detail"]["balance"] == str((Decimal("-100") / price_convert * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))

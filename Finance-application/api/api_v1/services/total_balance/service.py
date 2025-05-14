@@ -3,7 +3,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from redis import Redis
 
 from api.api_v1.services.total_balance.interface import UserBalanceServiceI
-from api.api_v1.services.total_balance.schemas import BalanceRead, BalancesHistoryRead
+from api.api_v1.services.total_balance.schemas import BalanceRead, BalancesHistoryRead, BalanceGet
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
@@ -25,15 +25,19 @@ class UserBalanceService(UserBalanceServiceI):
         self.repository_settings = settings_repository
         self.db_redis = db_redis
 
-    async def get_balances(self, token: JwtInfo) -> GenericResponse[BalancesHistoryRead]:
+    async def get_balances(self, balance: BalanceGet, token: JwtInfo) -> GenericResponse[BalancesHistoryRead]:
         async with self.session() as session:
             result = await self.repository.find(session=session,validate=True,chat_id=token.id)
             settings = await self.repository_settings.find(session=session, validate=True, chat_id=token.id)
         convert_coef = 1
-        if not "RUB" == settings.main_currency:
+        if balance.currency:
+            currency = balance.currency
+        else:
+            currency = settings.main_currency
+        if not "RUB" == currency:
             async with self.db_redis() as session:
                 price_base  = Decimal(await session.get("RUB"))
-                price_convert = Decimal(await session.get(settings.main_currency))
+                price_convert = Decimal(await session.get(currency))
                 convert_coef = (price_base/price_convert).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
 
         result = list(map(lambda x: (Decimal(x)/convert_coef).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP),
@@ -42,11 +46,15 @@ class UserBalanceService(UserBalanceServiceI):
         return GenericResponse[BalancesHistoryRead](detail=result)
 
 
-    async def get_balance(self, token: JwtInfo) -> GenericResponse[BalanceRead]:
+    async def get_balance(self, balance: BalanceGet, token: JwtInfo) -> GenericResponse[BalanceRead]:
         async with self.session() as session:
             result = await self.repository.find(session=session, validate=True, chat_id=token.id)
             settings = await self.repository_settings.find(session=session, validate=True, chat_id=token.id)
-        result.balance = await self.work_with_money.convert(base_currency=settings.main_currency,
+        if balance.currency:
+            currency = balance.currency
+        else:
+            currency = settings.main_currency
+        result.balance = await self.work_with_money.convert(base_currency=currency,
                                                             convert_currency="RUB",
                                                             amount=result.balance)
         result = BalanceRead.model_validate(result, from_attributes=True)
