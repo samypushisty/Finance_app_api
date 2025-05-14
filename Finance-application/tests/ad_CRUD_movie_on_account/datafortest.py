@@ -5,7 +5,6 @@ class DataForTestMovieOnAccount:
     def __init__(self):
         self.input_e2_c2 = {
             "title": "string",
-            "description": "string",
             "type": "earning",
             "worth": 1000,
             "currency": "USD",
@@ -163,6 +162,7 @@ class DataForTestMovieOnAccount:
         self.new_id_1 = {
             "table_id": 1,
             "worth": 1200,
+            "description": "string"
         }
 
         self.new_id_2 = {
@@ -183,7 +183,7 @@ class DataForTestMovieOnAccount:
             "chat_id": 9999999999,
             "table_id": 1,
             "title": "string",
-            "description": "string",
+            "description": None,
             "type": "earning",
             "worth": "1000.00",
             "currency": "USD",

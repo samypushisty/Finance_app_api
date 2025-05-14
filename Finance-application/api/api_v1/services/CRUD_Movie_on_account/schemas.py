@@ -8,7 +8,7 @@ from core.models.base import MovieType
 
 class UserMoviePost(BaseModel):
     title: str = Field(max_length=15)
-    description: str = Field(max_length=256)
+    description: Optional[str] = Field(None, max_length=256)
     type: MovieType
     worth: Decimal = Field(gt=0, decimal_places=2)
     currency: str = Field(max_length=3)
@@ -38,7 +38,7 @@ class UserMoviePost(BaseModel):
 class UserMoviePatch(BaseModel):
     table_id: int
     title: Optional[str] = Field(None, max_length=15)
-    description: Optional[str] = Field(None,max_length=256)
+    description: Optional[str] = Field(None, max_length=256)
     worth: Optional[Decimal] = Field(None,gt=0, decimal_places=2)
     currency: Optional[str] = Field(None,max_length=3)
 
@@ -58,7 +58,7 @@ class UserMovieRead(BaseModel):
     chat_id: int = Field(ge=10000000, le=10000000000)
     table_id: int
     title: str = Field(max_length=15)
-    description: str = Field(max_length=256)
+    description: Optional[str] = Field(None, max_length=256)
     type: MovieType
     worth: Decimal = Field(gt=0, decimal_places=2)
     currency: Optional[str] = Field(max_length=3)

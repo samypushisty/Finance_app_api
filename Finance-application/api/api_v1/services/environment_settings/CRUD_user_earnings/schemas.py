@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, field_validator
 
 class UserTypeEarningsPost(BaseModel):
     name: str = Field(max_length=15)
-    description: str = Field(max_length=256)
+    description: Optional[str] = Field(None, max_length=256)
     currency: str = Field(max_length=3)
 
     @field_validator("currency", mode="after")
@@ -51,7 +51,7 @@ class UserTypeEarningsRead(BaseModel):
     table_id: int
     chat_id: int = Field(ge=10000000, le=10000000000)
     name: str = Field(max_length=15)
-    description: str = Field(max_length=15)
+    description: Optional[str] = Field(None, max_length=15)
     currency: str = Field(max_length=3)
     balance: Decimal = Field(decimal_places=2)
 

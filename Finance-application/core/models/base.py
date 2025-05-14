@@ -58,7 +58,7 @@ class CashAccount(Base):
     chat_id: Mapped[intfk]
     balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     name: Mapped[str_15]
-    description: Mapped[str_256]
+    description: Mapped[Optional[str_256]]
     type: Mapped[CashAccountType]
     currency: Mapped[str_3]
 
@@ -80,7 +80,7 @@ class Earnings(Base):
     table_id: Mapped[intpk]
     chat_id: Mapped[intfk]
     name: Mapped[str_15]
-    description: Mapped[str_256]
+    description: Mapped[Optional[str_256]]
     balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     currency: Mapped[str_3]
 

@@ -68,7 +68,6 @@ class DataForTestCashAccounts:
         self.input = {
             "balance": 10,
             "name": "string",
-            "description": "string",
             "type": "cash",
             "currency": "USD"
         }
@@ -116,7 +115,7 @@ class DataForTestCashAccounts:
             # убрать в конце
             "chat_id": 9999999999,
             "name": "string",
-            "description": "string",
+            "description": None,
             "type": "cash",
             "currency": "USD"
         }
@@ -148,7 +147,6 @@ class DataForTestTypeEarnings:
     def __init__(self):
         self.input = {
             "name": "string",
-            "description": "string",
             "currency": "USD"
         }
 
@@ -190,7 +188,7 @@ class DataForTestTypeEarnings:
             # убрать в конце
             "chat_id": 9999999999,
             "name": "string",
-            "description": "string",
+            "description": None,
             "currency": "USD",
             "balance": "0.00"
         }
