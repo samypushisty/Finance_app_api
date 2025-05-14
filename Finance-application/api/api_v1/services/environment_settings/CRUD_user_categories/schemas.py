@@ -9,6 +9,7 @@ from core.redis_db.redis_helper import redis_client
 class UserCategoryPost(BaseModel):
     month_limit: float = Field(ge=0)
     name: str = Field(max_length=15)
+    description: Optional[str] = Field(None, max_length=256)
     currency: str = Field(max_length=3)
 
     @field_validator("currency", mode="after")
@@ -22,6 +23,7 @@ class UserCategoryPatch(BaseModel):
     table_id: int
     month_limit: Optional[float] = Field(None, ge=0)
     name: Optional[str] = Field(None, max_length=15)
+    description: Optional[str] = Field(None, max_length=256)
     currency: Optional[str] = Field(None, max_length=3)
 
     @field_validator("currency", mode="after")
@@ -50,6 +52,7 @@ class UserCategoryRead(BaseModel):
     chat_id: int = Field(ge=10000000, le=10000000000)
     month_limit: float = Field(ge=0)
     name: str = Field(max_length=15)
+    description: Optional[str] = Field(None, max_length=256)
     currency: str = Field(max_length=3)
     balance: Decimal = Field(decimal_places=2)
 

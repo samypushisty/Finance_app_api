@@ -30,6 +30,7 @@ class DataForTestUserCategories:
             "table_id": 2,
             "month_limit": 100,
             "name": "string",
+            "description": "something",
             "currency": "BYN"
         }
 
@@ -37,6 +38,7 @@ class DataForTestUserCategories:
             "table_id": 4,
             "month_limit": 100,
             "name": "string",
+            "description": "something",
             "currency": "BYN"
         }
         self.for_test = {
@@ -45,6 +47,7 @@ class DataForTestUserCategories:
             "chat_id": 9999999999,
             "month_limit": 1,
             "name": "string",
+            "description": None,
             "currency": "USD",
             "balance": "0.00"
         }
@@ -55,6 +58,7 @@ class DataForTestUserCategories:
             "chat_id": 9999999999,
             "month_limit": 100,
             "name": "string",
+            "description": "something",
             "currency": "BYN",
             "balance": "0.00"
         }
