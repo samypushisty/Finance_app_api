@@ -1,10 +1,10 @@
 from api.api_v1.services.CRUD_Movie_on_account.interface import UserMovieServiceI
 from api.api_v1.services.CRUD_Movie_on_account.schemas import UserMoviePost, UserMoviePatch, UserMoviesRead, \
-    UserMovieRead, UserMovieGet
+    UserMovieRead, UserMovieGet, UserMoviesGet
 from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
 from api.api_v1.utils.repository import SQLAlchemyRepository
-from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartException
-from core.models.base import CashAccount, MovieOnAccount, Balance
+from api.api_v1.services.base_schemas.schemas import GenericResponse
+from core.models.base import MovieOnAccount
 from secure import JwtInfo
 from typing import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -80,10 +80,11 @@ class UserMovieService(UserMovieServiceI):
                                     table_id=user_movie.table_id)
 
 
-    async def get_movies(self, token: JwtInfo) -> GenericResponse[UserMoviesRead]:
+    async def get_movies(self,user_movie: UserMoviesGet, token: JwtInfo) -> GenericResponse[UserMoviesRead]:
         async with self.session() as session:
             async with session.begin():
-                result = await self.repository.find_all(session=session, validate=True, order_column="table_id",chat_id=token.id)
+                result = await self.repository.find_paginated(session=session,page=user_movie.page, validate=True,
+                                                              order_column="table_id", chat_id=token.id)
         result_movies = UserMoviesRead(movies=[])
         for i in result:
             result_movies.movies.append(UserMovieRead.model_validate(i, from_attributes=True))

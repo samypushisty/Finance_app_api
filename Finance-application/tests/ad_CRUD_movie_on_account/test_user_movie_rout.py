@@ -35,12 +35,14 @@ def test_post(client,data_for_test):
     assert response.status_code == data_for_test.data.status_code
 
 @pytest.mark.parametrize("data_for_test",
-                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200)),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=404)),
-                          DataForFixture(id="www",data=DataDTO(status_code=401))],
+                         [DataForFixture(id=9999999999,data=DataDTO(status_code=200, data={"page": 1})),
+                          DataForFixture(id=9999999999,data=DataDTO(status_code=404, data={"page": 2})),
+                          DataForFixture(id=9999999999,data=DataDTO(status_code=422, data={"page": 0})),
+                          DataForFixture(id=1234567897,data=DataDTO(status_code=404, data={"page": 1})),
+                          DataForFixture(id="www",data=DataDTO(status_code=401, data={"page": 1}))],
                          indirect=True, scope="function", ids=idfn)
 def test_get_all(client,data_for_test):
-    response = client.get("/api/v1/movies/all", params={"token": data_for_test.token})
+    response = client.get("/api/v1/movies/all", params={"page":data_for_test.data.data["page"],"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)
@@ -195,7 +197,7 @@ def test_delete(client,data_for_test):
                           DataForFixture(id="www",data=DataDTO(status_code=401))],
                          indirect=True, scope="function", ids=idfn)
 def test_get_all_patch(client,data_for_test):
-    response = client.get("/api/v1/movies/all", params={"token": data_for_test.token})
+    response = client.get("/api/v1/movies/all", params={"page":1,"token": data_for_test.token})
     answer = json.loads(response.text)
     print(answer)
     print(data_for_test.data.status_code)

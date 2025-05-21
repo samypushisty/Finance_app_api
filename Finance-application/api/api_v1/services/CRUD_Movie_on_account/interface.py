@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Protocol
 
 from api.api_v1.services.CRUD_Movie_on_account.schemas import UserMoviePost, UserMoviePatch, UserMoviesRead, \
-    UserMovieGet, UserMovieRead
+    UserMovieGet, UserMovieRead, UserMoviesGet
 from secure import JwtInfo
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 
@@ -16,7 +16,7 @@ class UserMovieServiceI(Protocol):
         ...
 
     @abstractmethod
-    async def get_movies(self, token: JwtInfo) -> GenericResponse[UserMoviesRead]:
+    async def get_movies(self, user_movie: UserMoviesGet, token: JwtInfo) -> GenericResponse[UserMoviesRead]:
         ...
 
     @abstractmethod

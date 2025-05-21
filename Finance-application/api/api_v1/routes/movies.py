@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from api.api_v1.services.CRUD_Movie_on_account import UserMovieServiceI
-from api.api_v1.services.CRUD_Movie_on_account.schemas import UserMoviePost, UserMovieGet, UserMovieRead, \
+from api.api_v1.services.CRUD_Movie_on_account.schemas import UserMoviePost, UserMovieGet, UserMoviesGet, UserMovieRead, \
     UserMoviesRead, UserMoviePatch
 from api.api_v1.container import container
 from api.api_v1.services.base_schemas.schemas import GenericResponse
@@ -32,10 +32,11 @@ async def patch_movie(
 
 @router.get("/all",response_model=GenericResponse[UserMoviesRead])
 async def get_movies(
+        user_movie: UserMoviesGet = Depends(),
         token: JwtInfo = Depends(validation),
         user_movies_service = Depends(get_movies_service),
         ):
-    return await user_movies_service.get_movies(token=token)
+    return await user_movies_service.get_movies(user_movie=user_movie, token=token)
 
 
 @router.get("",response_model=GenericResponse[UserMovieRead])

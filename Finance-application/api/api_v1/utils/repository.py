@@ -83,6 +83,22 @@ class SQLAlchemyRepository(AbstractRepository):
         return result
 
 
+    async def find_paginated(self, session: AsyncSession, page: int, order_column: str, validate: bool = False, per_page: int = 20, **filters):
+        offset = (page - 1) * per_page
+        query = (
+            select(self.model)
+            .filter_by(**filters)
+            .order_by(getattr(self.model, order_column))
+            .offset(offset)
+            .limit(per_page)
+        )
+        result = await session.execute(query)
+        result = result.scalars().all()
+        if not result and validate:
+            raise StandartException(status_code=404, detail="not found")
+        return result
+
+
     async def patch(self, session: AsyncSession, data: dict, **filters):
         print("patch")
         print(session)

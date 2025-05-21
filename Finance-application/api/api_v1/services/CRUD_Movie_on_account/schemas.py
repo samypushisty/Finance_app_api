@@ -53,6 +53,8 @@ class UserMoviePatch(BaseModel):
 class UserMovieGet(BaseModel):
     table_id: int
 
+class UserMoviesGet(BaseModel):
+    page: int = Field(ge=1)
 
 class UserMovieRead(BaseModel):
     chat_id: int = Field(ge=10000000, le=10000000000)
