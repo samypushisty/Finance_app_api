@@ -2,19 +2,14 @@
 
 ## Overview
 
-This web application is a personal project created to demonstrate my technical skills and expertise. It is a personal finance tracker with Telegram ID registration using JWT authentication. Key features include:
-Multi-currency support:
-Automatic currency conversion rates updates
-Real-time balance calculations in different currencies
-Total balance overview
-Category-specific balance tracking
+This web application is a personal project created to demonstrate my technical skills and expertise. It is a personal finance tracker with Telegram ID registration using JWT authentication.
 
 ## Features
 
-- **Recording transactions by expense/income categories and custom financial accounts**:Users can create expense/income categories and cash accounts, then use them to record transactions(FastAPI, Posgres).
+- **Recording transactions by expense/income categories and custom financial accounts**:Users can create expense/income categories and cash accounts, then use them to record transactions(FastAPI, Postgres).
 - **Multiple currencies**:Users can track transactions and balances in multiple currencies that update automatically(Celery, Redis).
 - **Registration**: Users can register and authenticate using their Telegram ID. They receive a JWT token, which allows them to perform further operations on the web app.
-- 
+
 ## Technologies Usedmonetaryand track them afterward
 
 - **Backend**: FastAPI
@@ -24,7 +19,7 @@ Category-specific balance tracking
 
 ## Installation
 
-Follow these steps to install and run the Cloud Storage application on your local machine.
+Follow these steps to install and run the web application on your local machine.
 
 ### Prerequisites
 
