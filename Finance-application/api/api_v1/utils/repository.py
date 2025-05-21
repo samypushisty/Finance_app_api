@@ -23,15 +23,24 @@ class AbstractRepository(ABC):
 
 
     @abstractmethod
+    async def find_paginated(self, session: AsyncSession, page: int, order_column: str, validate: bool = False, per_page: int = 20, **filters):
+        ...
+
+
+    @abstractmethod
     async def patch(self, session: AsyncSession, data: dict, **filters):
         ...
+
 
     @abstractmethod
     async def patch_field(self, session: AsyncSession, field: str, value: Decimal, **filters):
         ...
+
+
     @abstractmethod
     async def delete(self, session: AsyncSession,**filters):
         ...
+
 
 class SQLAlchemyRepository(AbstractRepository):
 
