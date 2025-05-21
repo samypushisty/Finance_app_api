@@ -10,7 +10,7 @@ This web application is a personal project created to demonstrate my technical s
 - **Multiple currencies**:Users can track transactions and balances in multiple currencies that update automatically(Celery, Redis).
 - **Registration**: Users can register and authenticate using their Telegram ID. They receive a JWT token, which allows them to perform further operations on the web app.
 
-## Technologies Usedmonetaryand track them afterward
+## Technologies Used
 
 - **Backend**: FastAPI
 - **Database**: Postgres, Redis (for task management and storage for сurrency exchange rate storage)
@@ -55,8 +55,9 @@ Make sure you have the following tools installed:
    ```bash
      celery -A celery_app.app worker --loglevel=INFO -P solo
      celery -A celery_app.app beat --loglevel=INFO
+   ```
    
-  For shutdown ctrl c
+    For shutdown ctrl c
 6. **Start main app**
 
    start main.py
