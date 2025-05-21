@@ -16,7 +16,11 @@ This web application is a personal project created to demonstrate my technical s
 - **Database**: Postgres, Redis (for task management and storage for сurrency exchange rate storage)
 - **Task Queue**: Celery
 - **Containerization**: Docker Compose
-
+- **Database queries**: SQL Alchemy
+- **Database migrations**: Alembic
+- **Data validation**: Pydantic
+- **Tests**: Pytest
+  
 ## Installation
 
 Follow these steps to install and run the web application on your local machine.
