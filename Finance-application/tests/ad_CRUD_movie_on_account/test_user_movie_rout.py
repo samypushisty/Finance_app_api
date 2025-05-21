@@ -136,9 +136,7 @@ def test_patch_balance_1(client,data_for_test):
     price_convert_usd = Decimal(redis_client.get("USD"))
     price_convert_eur = Decimal(redis_client.get("EUR"))
 
-    assert answer["detail"]["balance"] == str((Decimal("840.00") / price_convert_usd * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
-                                              +
-                                              (Decimal("900.00") / price_convert_eur * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
+    assert answer["detail"]["balance"] == str(((Decimal("840.00") / price_convert_usd * price_base)+(Decimal("900.00") / price_convert_eur * price_base)).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
     assert answer_cash_account["detail"]["balance"] == str((Decimal("810.00") / price_convert_usd * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
     assert answer_earnings["detail"]["balance"] == str((Decimal("1200") / price_convert_usd * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
     assert answer_outlays["detail"]["balance"] == str((Decimal("-400") / price_convert_usd * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
@@ -164,9 +162,7 @@ def test_patch_balance_2(client,data_for_test):
     price_convert_usd = Decimal(redis_client.get("USD"))
     price_convert_eur = Decimal(redis_client.get("EUR"))
 
-    assert answer["detail"]["balance"] == str((Decimal("840.00") / price_convert_usd * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
-                                              +
-                                              (Decimal("900.00") / price_convert_eur * price_base).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
+    assert answer["detail"]["balance"] == str(((Decimal("840.00") / price_convert_usd * price_base)+(Decimal("900.00") / price_convert_eur * price_base)).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
     assert answer_cash_account["detail"]["balance"] == str(Decimal("10.00").quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
                                                            +
                                                            (Decimal("900.00") / price_convert_eur * price_convert_usd).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))

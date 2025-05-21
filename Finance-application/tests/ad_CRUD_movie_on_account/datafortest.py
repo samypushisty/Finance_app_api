@@ -1,6 +1,3 @@
-from unicodedata import category
-
-
 class DataForTestMovieOnAccount:
     def __init__(self):
         self.input_e2_c2 = {

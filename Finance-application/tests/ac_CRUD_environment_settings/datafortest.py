@@ -1,3 +1,7 @@
+from core.redis_db.redis_helper import redis_client
+from decimal import Decimal, ROUND_HALF_UP
+
+
 class DataForTestUserCategories:
     def __init__(self):
         self.input = {
@@ -122,7 +126,7 @@ class DataForTestCashAccounts:
 
         self.for_test_patch = {
             "table_id": 1,
-            "balance": "33.90",
+            "balance": str((10*Decimal(redis_client.get("BYN"))).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)),
             # убрать в конце
             "chat_id": 9999999999,
             "name": "stringn",
