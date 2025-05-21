@@ -52,6 +52,8 @@ class UserCategoriesService(UserCategoriesServiceI):
         async with self.session() as session:
             result = await self.repository.find(session=session, validate=True,
                                                 chat_id=token.id, table_id=user_category.table_id)
+        if user_category.currency:
+            result.currency = user_category.currency
         result = UserCategoryRead.model_validate(result, from_attributes=True)
         result.balance = await self.work_with_money.convert(base_currency=result.currency,
                                                             convert_currency="RUB",
