@@ -28,12 +28,14 @@ class UserBalanceService(UserBalanceServiceI):
     async def get_balances(self, balance: BalanceGet, token: JwtInfo) -> GenericResponse[BalancesHistoryRead]:
         async with self.session() as session:
             result = await self.repository.find(session=session,validate=True,chat_id=token.id)
-            settings = await self.repository_settings.find(session=session, validate=True, chat_id=token.id)
+            if balance.currency:
+                currency = balance.currency
+            else:
+                settings = await self.repository_settings.find(session=session, validate=True, chat_id=token.id)
+                currency = settings.main_currency
+
         convert_coef = 1
-        if balance.currency:
-            currency = balance.currency
-        else:
-            currency = settings.main_currency
+
         if not "RUB" == currency:
             async with self.db_redis() as session:
                 price_base  = Decimal(await session.get("RUB"))
@@ -49,11 +51,13 @@ class UserBalanceService(UserBalanceServiceI):
     async def get_balance(self, balance: BalanceGet, token: JwtInfo) -> GenericResponse[BalanceRead]:
         async with self.session() as session:
             result = await self.repository.find(session=session, validate=True, chat_id=token.id)
-            settings = await self.repository_settings.find(session=session, validate=True, chat_id=token.id)
-        if balance.currency:
-            currency = balance.currency
-        else:
-            currency = settings.main_currency
+            if balance.currency:
+                currency = balance.currency
+            else:
+                settings = await self.repository_settings.find(session=session, validate=True, chat_id=token.id)
+                currency = settings.main_currency
+
+
         result.balance = await self.work_with_money.convert(base_currency=currency,
                                                             convert_currency="RUB",
                                                             amount=result.balance)

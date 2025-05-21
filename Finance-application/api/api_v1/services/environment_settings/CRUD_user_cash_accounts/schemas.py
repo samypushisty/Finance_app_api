@@ -41,16 +41,6 @@ class UserCashAccountPatch(BaseModel):
 
 class UserCashAccountGet(BaseModel):
     table_id: int
-    currency: Optional[str]  = Field(None, max_length=3)
-
-    @field_validator("currency", mode="after")
-    def validate_currency(cls, value: str):
-        if value is None:
-            return value
-        value = value.upper()
-        if not redis_client.exists(value):
-            raise StandartException(status_code=401, detail=f"Currency '{value}' does not exist in Redis")
-        return value
 
 
 class UserCashAccountRead(BaseModel):
