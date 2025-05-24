@@ -19,6 +19,7 @@ class UserMovieServiceI(Protocol):
     async def get_movies(self, user_movie: UserMoviesGet, token: JwtInfo) -> GenericResponse[UserMoviesRead]:
         ...
 
+
     @abstractmethod
     async def get_movie(self, user_movie: UserMovieGet, token: JwtInfo) -> GenericResponse[UserMovieRead]:
         ...

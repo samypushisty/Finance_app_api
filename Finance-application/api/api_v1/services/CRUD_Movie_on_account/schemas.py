@@ -36,7 +36,7 @@ class UserMoviePost(BaseModel):
 
 
 class UserMoviePatch(BaseModel):
-    table_id: int
+    table_id: int = Field(ge=0)
     title: Optional[str] = Field(None, max_length=15)
     description: Optional[str] = Field(None, max_length=256)
     worth: Optional[Decimal] = Field(None,gt=0, decimal_places=2)
@@ -51,14 +51,23 @@ class UserMoviePatch(BaseModel):
         return value
 
 class UserMovieGet(BaseModel):
-    table_id: int
+    table_id: int = Field(ge=0)
 
 class UserMoviesGet(BaseModel):
     page: int = Field(ge=1)
+    earnings_id: Optional[int] = Field(None, ge=0)
+    categories_id: Optional[int] = Field(None, ge=0)
+    cash_account_id: Optional[int] = Field(None, ge=0)
+
+    @model_validator(mode="after")
+    def check_passwords_match(self) -> "UserMoviesGet":
+        if not(self.earnings_id is not None and self.categories_id is not None):
+            return self
+        raise ValueError("should be one of categories_id and earnings_id")
 
 class UserMovieRead(BaseModel):
     chat_id: int = Field(ge=10000000, le=10000000000)
-    table_id: int
+    table_id: int  = Field(ge=0)
     title: str = Field(max_length=15)
     description: Optional[str] = Field(None, max_length=256)
     type: MovieType

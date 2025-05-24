@@ -81,10 +81,17 @@ class UserMovieService(UserMovieServiceI):
 
 
     async def get_movies(self,user_movie: UserMoviesGet, token: JwtInfo) -> GenericResponse[UserMoviesRead]:
+        additional_params = {}
+        if user_movie.earnings_id is not None:
+            additional_params["earnings_id"] = user_movie.earnings_id
+        if user_movie.categories_id is not None:
+            additional_params["categories_id"] = user_movie.categories_id
+        if user_movie.cash_account_id is not None:
+            additional_params["cash_account"] = user_movie.cash_account_id
         async with self.session() as session:
             async with session.begin():
                 result = await self.repository.find_paginated(session=session,page=user_movie.page, validate=True,
-                                                              order_column="table_id", chat_id=token.id)
+                                                              order_column="table_id", chat_id=token.id, **additional_params)
         result_movies = UserMoviesRead(movies=[])
         for i in result:
             result_movies.movies.append(UserMovieRead.model_validate(i, from_attributes=True))
