@@ -20,6 +20,7 @@ This web application is a personal project created to demonstrate my technical s
 - **Database migrations**: Alembic
 - **Data validation**: Pydantic
 - **Tests**: Pytest
+- **Test database**: Postgres (spescial DB for tests in Docker)
   
 ## Installation
 
