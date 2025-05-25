@@ -1,6 +1,6 @@
 services:
 
-  db:
+  test_db:
     image: postgres
     environment:
 

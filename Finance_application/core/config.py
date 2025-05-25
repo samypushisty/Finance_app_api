@@ -12,7 +12,8 @@ class RunConfig(BaseModel):
 class RedisConfig(BaseModel):
     REDIS_PORT: int = 6379
     REDIS_PASSWORD: str = ""
-    REDIS_HOST: str = "0.0.0.0"
+    REDIS_HOST: str = ""
+    REDIS_LOCAL_HOST: str = "0.0.0.0"
 
 class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"

@@ -5,10 +5,6 @@ from api.api_v1.services.base_schemas.schemas import StandartException
 from core.config import settings
 
 
-
-
-
-
 def validation(token: str):
     jwt_info = JwtInfo(token)
     if jwt_info.valid:

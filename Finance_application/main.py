@@ -46,8 +46,9 @@ main_app.include_router(
 )
 
 origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    "*"
+    # "http://localhost:5173",
+    # "http://127.0.0.1:5173",
 ]
 
 @main_app.exception_handler(StandartException)
@@ -66,10 +67,10 @@ main_app.add_middleware(
 )
 
 
-if __name__ == "__main__":
-    uvicorn.run(
-        "main:main_app",
-        reload=True,
-        host=settings.run.host,
-        port=settings.run.port
-    )
+# if __name__ == "__main__":
+#     uvicorn.run(
+#         "main:main_app",
+#         reload=True,
+#         host=settings.run.host,
+#         port=settings.run.port
+#     )
