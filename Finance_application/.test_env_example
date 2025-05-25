@@ -1,0 +1,5 @@
+        APP_CONFIG__DB__URL=postgresql+asyncpg://user:password@localhost:5433/user
+        APP_CONFIG__DB__SYNC_URL=postgresql+psycopg2://user:password@localhost:5433/user
+Change  APP_CONFIG__SECRET_KEY=secret_key
+Change  APP_CONFIG__DB_REDIS__REDIS_PASSWORD=password
+        APP_CONFIG__DB_REDIS__REDIS_HOST=0.0.0.0
