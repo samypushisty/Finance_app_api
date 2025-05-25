@@ -15,7 +15,7 @@ This web application is a personal project created to demonstrate my technical s
 - **Backend**: FastAPI
 - **Database**: Postgres, Redis (for task management and storage for сurrency exchange rate storage)
 - **Task Queue**: Celery
-- **Containerization**: Docker Compose
+- **Containerization**: Docker Compose, Docker File
 - **Database queries**: SQL Alchemy
 - **Database migrations**: Alembic
 - **Data validation**: Pydantic
@@ -40,28 +40,42 @@ Make sure you have the following tools installed:
    ```bash
    git clone https://github.com/samypushisty/finance_app_api
    cd Finance_app_back
-2. **Installing dependencies**
+
+2. **Fill out .env and .test_env**
+
+3. **Installing dependencies**
 
    ```bash
     pip install -r requirements.txt
-3. **Work repository**
    
-   ```bash
-   cd Finance-application
-4. **Create redis container**
+4. **Docker compose up web app**
 
    ```bash
-    docker-compose up -d
+     cd Finance_application
+     docker compose up -d
+   
 5. **Start celery app**
 
     To update currency exchange rates, run Celery worker and Celery Beat for 6 minutes, then shut them down.
 
    ```bash
-     celery -A celery_app.app worker --loglevel=INFO -P solo
+     celery -A celery_app.app worker --loglevel=INFO -P solo &
      celery -A celery_app.app beat --loglevel=INFO
    ```
    
-    For shutdown ctrl c
-6. **Start main app**
+    Close terminal
+   
+6. **Create test db**
+   ```bash
+     cd Finance_application
+     cd tests
+     docker_compose up -d
+   ```
+7. **Start tests**
+   ```bash
+     cd ..
+     pytest
+   ```
+7. **Conect and use**
 
-   start main.py
+  connect to http://0.0.0.0:8000/docs
