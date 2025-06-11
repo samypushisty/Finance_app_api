@@ -1,6 +1,7 @@
 services:
   app:
     build: .
+    container_name: finance_app
     ports:
       - "8000:8000"
     env_file:
@@ -14,19 +15,10 @@ services:
     container_name: finance_postgres
     env_file:
       - ./Finance_application/.env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   redis:
     image: redis:latest
@@ -39,11 +31,6 @@ services:
       - ./Finance_application/redis.conf:/usr/local/etc/redis/redis.conf
       - redis_data:/data
     command: redis-server /usr/local/etc/redis/redis.conf
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
 volumes:
   postgres_data:
