@@ -42,41 +42,55 @@ Make sure you have the following tools installed:
    git clone https://github.com/samypushisty/finance_app_api
    cd Finance_app_back
 
-2. **Fill out .env and .test_env**
+3. **Fill out .env and .test_env**
 
-3. **Installing dependencies**
+4. **Creating and activating a virtual environment**
+
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+
+5. **Installing dependencies**
 
    ```bash
     pip install -r requirements.txt
    
-4. **Docker compose up web app**
+6. **Docker compose up web app**
 
    ```bash
      cd Finance_application
-     docker compose up -d
+     sudo docker compose up --build
    
-5. **Start celery app**
+7. **Start celery app**
 
-    To update currency exchange rates, run Celery worker and Celery Beat for 6 minutes, then shut them down.
+   To update currency exchange rates, run Celery worker and Celery Beat for 6 minutes, then shut them down.
 
+   Open new terminal
    ```bash
+     python3 -m venv .venv
+     cd Finance_application
      celery -A celery_app.app worker --loglevel=INFO -P solo &
      celery -A celery_app.app beat --loglevel=INFO
    ```
    
     Close terminal
    
-6. **Create test db**
+9. **Create test db**
+
+   Open new terminal
    ```bash
+     source .venv/bin/activate
      cd Finance_application
      cd tests
-     docker_compose up -d
+     sudo docker compose up --build
    ```
-7. **Start tests**
-   ```bash
-     cd ..
-     pytest
-   ```
-7. **Conect and use**
 
-  connect to http://0.0.0.0:8000/docs
+10. **Start tests**
+    ```bash
+    cd ..
+    pytest
+    ```
+   
+11. **Conect and use**
+
+    connect to http://0.0.0.0:8000/docs
