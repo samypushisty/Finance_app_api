@@ -33,6 +33,7 @@ Make sure you have the following tools installed:
 - Python 3.12.3
 - Docker
 - Docker Compose
+- Ubuntu
   
 ### Installation Steps
 
@@ -40,9 +41,9 @@ Make sure you have the following tools installed:
 
    ```bash
    git clone https://github.com/samypushisty/finance_app_api
-   cd Finance_app_back
+   cd Finance_app_api
 
-3. **Fill out .env and .test_env**
+3. **Fill out .env, .test_env and redis.conf**
 
 4. **Creating and activating a virtual environment**
 
@@ -58,7 +59,6 @@ Make sure you have the following tools installed:
 6. **Docker compose up web app**
 
    ```bash
-     cd Finance_application
      sudo docker compose up --build
    
 7. **Start celery app**
@@ -67,6 +67,7 @@ Make sure you have the following tools installed:
 
    Open new terminal
    ```bash
+     cd Finance_app_api
      python3 -m venv .venv
      cd Finance_application
      celery -A celery_app.app worker --loglevel=INFO -P solo &
@@ -86,11 +87,18 @@ Make sure you have the following tools installed:
    ```
 
 10. **Start tests**
+
+    Open new terminal
     ```bash
-    cd ..
+    cd Finance_application
     pytest
     ```
    
-11. **Conect and use**
+12. **Conect and use**
 
     connect to http://0.0.0.0:8000/docs
+    
+## Warning!
+1. Do not allow spaces in file paths
+2. All commands are for Ubuntu
+3. If you are using windows replace the UVLoop library with the Asyncio(3.4.3) library
