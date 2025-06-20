@@ -1,11 +1,13 @@
-from typing import AsyncGenerator
-from contextlib import asynccontextmanager
+from typing import AsyncGenerator, Generator
+from contextlib import asynccontextmanager, contextmanager
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     AsyncEngine,
     async_sessionmaker,
     AsyncSession,
 )
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
 
 from core.config import settings
 
@@ -41,6 +43,29 @@ class DatabaseHelper:
             print("open_sql")
             yield session
         print("close_sql")
+
+
+class SyncDatabaseHelper:
+    def __init__( self,
+        url: str,
+        echo: bool = False,
+        echo_pool: bool = False,
+        pool_size: int = 5,
+        max_overflow: int = 10):
+        self.engine = create_engine(
+            url=url,
+            echo=echo,
+            echo_pool=echo_pool,
+            pool_size=pool_size,
+            max_overflow=max_overflow,
+        )
+        self.SessionLocal = sessionmaker(bind=self.engine)
+
+    @contextmanager
+    def session_getter(self) -> Generator[Session, None, None]:
+        with self.SessionLocal() as session:
+            print("open_sql")
+            yield session
 
 
 db_helper = DatabaseHelper(

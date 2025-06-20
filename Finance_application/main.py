@@ -41,6 +41,7 @@ async def custom_swagger_ui_html():
 @main_app.get(main_app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
 async def swagger_ui_redirect():
     return get_swagger_ui_oauth2_redirect_html()
+
 main_app.include_router(
     api_router
 )
