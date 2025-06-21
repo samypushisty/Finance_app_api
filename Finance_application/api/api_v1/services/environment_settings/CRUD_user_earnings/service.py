@@ -23,7 +23,7 @@ class UserEarningsService(UserEarningsServiceI):
     async def post_user_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsPost, token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                await self.repository.add(session=session,data={"chat_id": token.id,"balance": 0, **user_type_of_earnings.model_dump()})
+                await self.repository.add(session=session,data={"chat_id": token.id, **user_type_of_earnings.model_dump()})
 
 
     async def patch_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsPatch, token: JwtInfo) -> None:

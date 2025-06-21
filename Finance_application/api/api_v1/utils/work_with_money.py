@@ -2,10 +2,21 @@ from abc import ABC, abstractmethod
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Callable, Literal
 from redis.asyncio import Redis
+from sqlalchemy import select, Result
+from sqlalchemy.orm import joinedload
 from api.api_v1.services.base_schemas.schemas import StandartException
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from api.api_v1.utils.repository import SQLAlchemyRepository
+from core.models.base import Category, CashAccount, CashAccountCurrency, CategoryCurrency, Earnings, EarningsCurrency
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
+
 
 
 class AbstractConverter(ABC):
@@ -19,6 +30,7 @@ class AbstractConverter(ABC):
                               category_id: int,
                               cash_id: int,
                               amount: Decimal,
+                              currency: str,
                               type_operation: Literal["earning","outlay"]):
         ...
 
@@ -75,29 +87,65 @@ class WorkWithMoneyRepository(AbstractConverter):
                               category_id: int,
                               cash_id: int,
                               amount: Decimal,
+                              currency: str,
                               type_operation: str):
-        # изменение балансов
-        if type_operation == "outlay":
-            await self.repository_categories.patch_field(session=session, field="balance",
-                                                                              value=-amount,chat_id=chat_id,
-                                                                              table_id=category_id)
-            balance_cash_account = await self.repository_cash_account.patch_field(session=session, field="balance",
-                                                                                  value=-amount,chat_id=chat_id,
-                                                                                  table_id=cash_id)
-            balance_main_account = await self.repository_balance.patch_field(session=session, field="balance",
-                                                                             value=-amount,chat_id=chat_id)
-            if balance_cash_account < 0 or balance_main_account < 0:
-                raise StandartException(status_code=403, detail="balance < 0")
-        elif type_operation == "earning":
-            await self.repository_type_of_earnings.patch_field(session=session,field="balance",
-                                                               value=amount,chat_id=chat_id,
-                                                               table_id=earning_id)
-            await self.repository_cash_account.patch_field(session=session, field="balance",
-                                                           value=amount,chat_id=chat_id,
-                                                           table_id=cash_id)
-            await self.repository_balance.patch_field(session=session, field="balance",
-                                                      value=amount,chat_id=chat_id)
+        query = (select(CashAccount).
+                 options(joinedload(CashAccount.currencies)).
+                 filter_by(table_id=cash_id)
+                 )
+        cash_table: Result = await session.execute(query)
+        cash_table: CashAccount = cash_table.scalars().first()
+        logger.info("all currencies" + str(*[i.currency for i in cash_table.currencies]))
 
+        if type_operation == "outlay":
+            query = (select(Category).
+                     options(joinedload(Category.currencies)).
+                     filter_by(table_id=category_id)
+                     )
+            category_table: Result = await session.execute(query)
+            category_table: Category = category_table.scalars().first()
+            logger.info(*category_table.currencies)
+
+            cash_currency: CashAccountCurrency = next((c for c in cash_table.currencies if c.currency == currency), None)
+            category_currency: CategoryCurrency = next((c for c in category_table.currencies if c.currency == currency), None)
+
+            if not cash_currency or cash_currency.amount < amount:
+                raise StandartException(status_code=403, detail="cash_balance_this_currency < 0")
+            else:
+                cash_currency.amount -= amount
+
+            if not category_currency:
+                category_table.currencies.append(
+                    CategoryCurrency(chat_id=chat_id, currency=currency, amount=amount)
+                )
+            else:
+                category_currency.amount += amount
+
+        if type_operation == "earning":
+            query = (select(Earnings).
+                     options(joinedload(Earnings.currencies)).
+                     filter_by(table_id=earning_id)
+                     )
+            earning_table: Result = await session.execute(query)
+            earning_table: Earnings = earning_table.scalars().first()
+            logger.info("all currencies" + str(*[i.currency for i in earning_table.currencies]))
+
+            cash_currency: CashAccountCurrency = next((c for c in cash_table.currencies if c.currency == currency), None)
+            earnings_currency: EarningsCurrency = next((c for c in earning_table.currencies if c.currency == currency), None)
+
+            if not cash_currency:
+                cash_table.currencies.append(
+                    CashAccountCurrency(chat_id=chat_id, currency=currency, amount=amount)
+                )
+            else:
+                cash_currency.amount += amount
+
+            if not earnings_currency:
+                earning_table.currencies.append(
+                    EarningsCurrency(chat_id=chat_id, currency=currency, amount=amount)
+                )
+            else:
+                earnings_currency.amount += amount
 
     async def edit_transaction(self, session: AsyncSession,
                                chat_id: int,

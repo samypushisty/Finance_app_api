@@ -1,6 +1,8 @@
+from sqlalchemy.orm import joinedload
+
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
-from core.models.base import Balance, UserSettings
+from core.models.base import Balance, UserSettings, CashAccountCurrency, CashAccount
 from .interface import UserCashAccountsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_cash_accounts.schemas import UserCashAccountPost, \
     UserCashAccountPatch, UserCashAccountsRead, UserCashAccountRead, UserCashAccountGet
@@ -8,7 +10,7 @@ from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartEx
 from secure import JwtInfo
 from typing import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from  sqlalchemy import select
 
 class UserCashAccountsService(UserCashAccountsServiceI):
     def __init__(self, repository: SQLAlchemyRepository,
@@ -27,13 +29,17 @@ class UserCashAccountsService(UserCashAccountsServiceI):
         token: JwtInfo) -> None:
         async with self.session() as session:
             async with session.begin():
-                main_account_worth = await self.work_with_money.convert(base_currency="RUB",
-                                                                        convert_currency=user_cash_account.currency,
-                                                                        amount=user_cash_account.balance)
-                user_cash_account.balance = main_account_worth
-                await self.repository.add(session=session,data={"chat_id": token.id, **user_cash_account.model_dump()})
-                await self.repository_balance.patch_field(session=session,field="balance",value=main_account_worth, chat_id=token.id)
-
+                await self.repository.add(session=session,
+                                          data={"chat_id": token.id,
+                                                "currencies": [CashAccountCurrency(
+                                                    chat_id=token.id,
+                                                    currency=user_cash_account.currency,
+                                                    amount=user_cash_account.balance
+                                                ), ],
+                                                "name":user_cash_account.name,
+                                                "description":user_cash_account.description,
+                                                "type":user_cash_account.type,
+                                                "currency":user_cash_account.currency})
 
 
     async def patch_user_cash_account(self, user_cash_account: UserCashAccountPatch, token: JwtInfo) -> None:

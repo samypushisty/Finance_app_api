@@ -20,23 +20,18 @@ class UserMovieService(UserMovieServiceI):
 
 
     async def post_movie(self, user_movie: UserMoviePost, token: JwtInfo) -> None:
-        worth = await self.work_with_money.convert(base_currency="RUB",
-                                                   convert_currency=user_movie.currency,
-                                                   amount=user_movie.worth)
         async with self.session() as session:
             async with session.begin():
-
-                # добавление операции
-                await self.repository.add(session=session, data={"chat_id": token.id, "base_worth": worth,
+                await self.repository.add(session=session, data={"chat_id": token.id,
                                                                  **user_movie.model_dump()})
-                # изменение балансов
                 await self.work_with_money.add_transaction(session=session,
                                                            chat_id=token.id,
                                                            cash_id=user_movie.cash_account,
                                                            category_id=user_movie.categories_id,
                                                            earning_id=user_movie.earnings_id,
                                                            type_operation=user_movie.type,
-                                                           amount=worth)
+                                                           currency=user_movie.currency,
+                                                           amount=user_movie.worth)
 
 
 
