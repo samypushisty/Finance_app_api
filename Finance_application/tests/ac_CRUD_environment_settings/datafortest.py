@@ -70,23 +70,12 @@ class DataForTestUserCategories:
 class DataForTestCashAccounts:
     def __init__(self):
         self.input = {
-            "balance": 10,
             "name": "string",
-            "type": "cash",
-            "currency": "USD"
-        }
-
-
-        self.wrong_balance = {
-            "balance": -10,
-            "name": "string",
-            "description": "string",
             "type": "cash",
             "currency": "USD"
         }
         
         self.wrong_description = {
-            "balance": 10,
             "name": "string",
             "description": "string"*50,
             "type": "cash",
@@ -115,7 +104,7 @@ class DataForTestCashAccounts:
         }
         self.for_test = {
             "table_id": 1,
-            "balance": "10.00",
+            "balance": "0.00",
             # убрать в конце
             "chat_id": 9999999999,
             "name": "string",
@@ -126,7 +115,7 @@ class DataForTestCashAccounts:
 
         self.for_test_patch = {
             "table_id": 1,
-            "balance": str((10*Decimal(redis_client.get("BYN"))).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)),
+            "balance": "0.00",
             # убрать в конце
             "chat_id": 9999999999,
             "name": "stringn",

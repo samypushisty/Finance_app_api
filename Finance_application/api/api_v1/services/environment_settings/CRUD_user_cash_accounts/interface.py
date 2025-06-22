@@ -3,7 +3,7 @@ from typing import Protocol
 
 from secure import JwtInfo
 from api.api_v1.services.environment_settings.CRUD_user_cash_accounts.schemas import UserCashAccountPost, \
-    UserCashAccountPatch, UserCashAccountsRead, UserCashAccountRead, UserCashAccountGet
+    UserCashAccountPatch, UserCashAccountsRead, UserCashAccountRead, UserCashAccountGet, UserCashAccountDelete
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 
 class UserCashAccountsServiceI(Protocol):
@@ -24,6 +24,6 @@ class UserCashAccountsServiceI(Protocol):
         ...
 
     @abstractmethod
-    async def delete_user_cash_account(self, user_cash_account: UserCashAccountGet, token: JwtInfo) -> None:
+    async def delete_user_cash_account(self, user_cash_account: UserCashAccountDelete, token: JwtInfo) -> None:
         ...
 

@@ -60,24 +60,15 @@ class CashAccount(Base):
     description: Mapped[Optional[str_256]]
     type: Mapped[CashAccountType]
     currency: Mapped[str_3]
-    currencies: Mapped[List["CashAccountCurrency"]] = relationship(
+
+    currencies_earnings: Mapped[List["EarningsCurrency"]] = relationship(
         back_populates="cash_account",
         cascade="all, delete-orphan"
     )
-
-class CashAccountCurrency(Base):
-    __tablename__ = "cash_account_currency"
-    __table_args__ = (
-        UniqueConstraint('cash_account_id', 'currency', name='_cash_account_currency_uc'),
+    currencies_outlays: Mapped[List["CategoryCurrency"]] = relationship(
+        back_populates="cash_account",
+        cascade="all, delete-orphan"
     )
-
-    table_id: Mapped[intpk]
-    chat_id: Mapped[intfk]
-    cash_account_id: Mapped[int] = mapped_column(ForeignKey("cash_account.table_id", ondelete="CASCADE"))
-    currency: Mapped[str_3]
-    amount: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
-
-    cash_account: Mapped["CashAccount"] = relationship(back_populates="currencies")
 
 
 class Category(Base):
@@ -97,16 +88,19 @@ class Category(Base):
 class CategoryCurrency(Base):
     __tablename__ = "category_currency"
     __table_args__ = (
-        UniqueConstraint('category_id', 'currency', name='_category_currency_uc'),
+        UniqueConstraint('category_id','cash_account_id', 'currency', name='_category_currency_uc'),
     )
 
     table_id: Mapped[intpk]
     chat_id: Mapped[intfk]
     category_id: Mapped[int] = mapped_column(ForeignKey("category.table_id", ondelete="CASCADE"))
+    cash_account_id: Mapped[int] = mapped_column(ForeignKey("cash_account.table_id", ondelete="CASCADE"))
     currency: Mapped[str_3]
     amount: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
 
     category: Mapped["Category"] = relationship(back_populates="currencies")
+    cash_account: Mapped["CashAccount"] = relationship(back_populates="currencies_outlays",
+                                                       passive_deletes=True)
 
 class Earnings(Base):
     __tablename__ = "earnings"
@@ -124,18 +118,20 @@ class Earnings(Base):
 class EarningsCurrency(Base):
     __tablename__ = "earnings_currency"
     __table_args__ = (
-        UniqueConstraint('earnings_id', 'currency', name='_earnings_currency_uc'),
+        UniqueConstraint('earnings_id','cash_account_id', 'currency', name='_earnings_currency_uc'),
     )
 
     table_id: Mapped[intpk]
     chat_id: Mapped[intfk]
     earnings_id: Mapped[int] = mapped_column(ForeignKey("earnings.table_id", ondelete="CASCADE"))
+    cash_account_id: Mapped[int] = mapped_column(ForeignKey("cash_account.table_id", ondelete="CASCADE"))
     currency: Mapped[str_3]
     amount: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
 
     earning: Mapped["Earnings"] = relationship(back_populates="currencies")
+    cash_account: Mapped["CashAccount"] = relationship(back_populates="currencies_earnings")
 
-# таблица с сетами
+
 class UserSettings(Base):
     __tablename__ = "settings"
 

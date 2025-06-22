@@ -2,7 +2,8 @@ from abc import abstractmethod
 from typing import Protocol
 
 from secure import JwtInfo
-from .schemas import UserTypeEarningsPost, UserTypeEarningsPatch, UserTypesEarningsRead, UserTypeEarningsGet, UserTypeEarningsRead
+from .schemas import UserTypeEarningsPost, UserTypeEarningsPatch, UserTypesEarningsRead, UserTypeEarningsGet, \
+    UserTypeEarningsRead, UserTypeEarningsDelete
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 
 class UserEarningsServiceI(Protocol):
@@ -23,6 +24,6 @@ class UserEarningsServiceI(Protocol):
         ...
 
     @abstractmethod
-    async def delete_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsGet, token: JwtInfo) -> None:
+    async def delete_type_of_earnings(self, user_type_of_earnings: UserTypeEarningsDelete, token: JwtInfo) -> None:
         ...
 

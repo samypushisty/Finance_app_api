@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from api.api_v1.services.base_schemas.schemas import StandartException
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.api_v1.utils.repository import SQLAlchemyRepository
-from core.models.base import Category, CashAccount, CashAccountCurrency, CategoryCurrency, Earnings, EarningsCurrency
+from core.models.base import Category, CashAccount, CategoryCurrency, Earnings, EarningsCurrency
 import logging
 
 logging.basicConfig(
@@ -89,14 +89,13 @@ class WorkWithMoneyRepository(AbstractConverter):
                               amount: Decimal,
                               currency: str,
                               type_operation: str):
-        query = (select(CashAccount).
-                 options(joinedload(CashAccount.currencies)).
-                 filter_by(table_id=cash_id)
+        query = (select(Earnings).
+                 options(joinedload(Earnings.currencies)).
+                 filter_by(table_id=earning_id)
                  )
-        cash_table: Result = await session.execute(query)
-        cash_table: CashAccount = cash_table.scalars().first()
-        logger.info("all currencies" + str(*[i.currency for i in cash_table.currencies]))
-
+        earning_table: Result = await session.execute(query)
+        earning_table: Earnings = earning_table.scalars().first()
+        logger.info("all currencies" + str(*[i.currency for i in earning_table.currencies]))
         if type_operation == "outlay":
             query = (select(Category).
                      options(joinedload(Category.currencies)).
@@ -106,14 +105,11 @@ class WorkWithMoneyRepository(AbstractConverter):
             category_table: Category = category_table.scalars().first()
             logger.info(*category_table.currencies)
 
-            cash_currency: CashAccountCurrency = next((c for c in cash_table.currencies if c.currency == currency), None)
+            cash_currency: EarningsCurrency = next((c for c in earning_table.currencies if c.currency == currency), None)
             category_currency: CategoryCurrency = next((c for c in category_table.currencies if c.currency == currency), None)
 
             if not cash_currency or cash_currency.amount < amount:
                 raise StandartException(status_code=403, detail="cash_balance_this_currency < 0")
-            else:
-                cash_currency.amount -= amount
-
             if not category_currency:
                 category_table.currencies.append(
                     CategoryCurrency(chat_id=chat_id, currency=currency, amount=amount)
@@ -122,27 +118,11 @@ class WorkWithMoneyRepository(AbstractConverter):
                 category_currency.amount += amount
 
         if type_operation == "earning":
-            query = (select(Earnings).
-                     options(joinedload(Earnings.currencies)).
-                     filter_by(table_id=earning_id)
-                     )
-            earning_table: Result = await session.execute(query)
-            earning_table: Earnings = earning_table.scalars().first()
-            logger.info("all currencies" + str(*[i.currency for i in earning_table.currencies]))
-
-            cash_currency: CashAccountCurrency = next((c for c in cash_table.currencies if c.currency == currency), None)
             earnings_currency: EarningsCurrency = next((c for c in earning_table.currencies if c.currency == currency), None)
-
-            if not cash_currency:
-                cash_table.currencies.append(
-                    CashAccountCurrency(chat_id=chat_id, currency=currency, amount=amount)
-                )
-            else:
-                cash_currency.amount += amount
 
             if not earnings_currency:
                 earning_table.currencies.append(
-                    EarningsCurrency(chat_id=chat_id, currency=currency, amount=amount)
+                    EarningsCurrency(chat_id=chat_id, cash_account_id=cash_id, currency=currency, amount=amount)
                 )
             else:
                 earnings_currency.amount += amount

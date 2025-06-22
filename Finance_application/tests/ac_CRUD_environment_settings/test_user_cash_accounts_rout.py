@@ -13,7 +13,6 @@ data_test = DataForTestCashAccounts()
                           DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
                           DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
                           DataForFixture(id=9999999999,data=DataDTO(status_code=200,data=data_test.input)),
-                          DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.wrong_balance)),
                           DataForFixture(id=1234567897,data=DataDTO(status_code=422,data=data_test.wrong_description)),
                           DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.input))],
                          indirect=True, scope="function", ids=idfn)

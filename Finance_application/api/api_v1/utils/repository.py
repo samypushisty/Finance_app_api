@@ -146,7 +146,7 @@ class SQLAlchemyRepository(AbstractRepository):
         print(result)
         return result
 
-    async def delete(self, session: AsyncSession,**filters):
+    async def delete(self, session: AsyncSession,validate = True,**filters):
         print("delete")
         print(session)
         query = (
@@ -154,6 +154,6 @@ class SQLAlchemyRepository(AbstractRepository):
             .filter_by(**filters)
         )
         result = await session.execute(query)
-        if result.rowcount == 0:
+        if result.rowcount == 0 and validate:
             raise StandartException(status_code=404, detail="not found")
         await session.flush()
