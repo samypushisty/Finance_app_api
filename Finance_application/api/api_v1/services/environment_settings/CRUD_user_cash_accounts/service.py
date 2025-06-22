@@ -1,8 +1,10 @@
-from sqlalchemy.orm import joinedload
+from decimal import Decimal
+
+from sqlalchemy.orm import joinedload, selectinload
 
 from api.api_v1.utils.repository import SQLAlchemyRepository
 from api.api_v1.utils.work_with_money import WorkWithMoneyRepository
-from core.models.base import Balance, UserSettings, CashAccountCurrency, CashAccount
+from core.models.base import CashAccountCurrency, CashAccount
 from .interface import UserCashAccountsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_cash_accounts.schemas import UserCashAccountPost, \
     UserCashAccountPatch, UserCashAccountsRead, UserCashAccountRead, UserCashAccountGet
@@ -10,7 +12,8 @@ from api.api_v1.services.base_schemas.schemas import GenericResponse, StandartEx
 from secure import JwtInfo
 from typing import Callable
 from sqlalchemy.ext.asyncio import AsyncSession
-from  sqlalchemy import select
+from sqlalchemy import select, Result
+
 
 class UserCashAccountsService(UserCashAccountsServiceI):
     def __init__(self, repository: SQLAlchemyRepository,
@@ -51,28 +54,64 @@ class UserCashAccountsService(UserCashAccountsServiceI):
 
     async def get_user_cash_accounts(self, token: JwtInfo) -> GenericResponse[UserCashAccountsRead]:
         async with self.session() as session:
-            result = await self.repository.find_all(session=session, validate=True, order_column="table_id", chat_id=token.id)
+            query = (
+                select(CashAccount)
+                .options(selectinload(CashAccount.currencies))
+                .filter_by(chat_id=token.id)
+                .order_by(CashAccount.table_id)
+            )
+            cash_accounts = await session.execute(query)
+            cash_accounts = cash_accounts.scalars().all()
+            if not cash_accounts:
+                raise StandartException(status_code=404, detail="not found")
         result_accounts = UserCashAccountsRead(accounts=[])
-        for i in result:
-            data = UserCashAccountRead.model_validate(i, from_attributes=True)
-            data.balance = await self.work_with_money.convert(base_currency=data.currency,
-                                                              convert_currency="RUB",
-                                                              amount=data.balance)
-            result_accounts.accounts.append(data)
+        for cash_account in cash_accounts:
+            balance = Decimal(0)
+            for cash_currencies in cash_account.currencies:
+                balance += await self.work_with_money.convert(base_currency=cash_account.currency,
+                                                              convert_currency=cash_currencies.currency,
+                                                              amount=cash_currencies.amount)
+            response_data = UserCashAccountRead(
+                table_id=cash_account.table_id,
+                chat_id=cash_account.chat_id,
+                name=cash_account.name,
+                description=cash_account.description,
+                type=cash_account.type,
+                currency=cash_account.currency,
+                balance=balance
+            )
+            result_accounts.accounts.append(response_data)
         return GenericResponse[UserCashAccountsRead](detail=result_accounts)
 
 
     async def get_user_cash_account(self,user_cash_account: UserCashAccountGet, token: JwtInfo) -> GenericResponse[UserCashAccountRead]:
         async with self.session() as session:
-            result = await self.repository.find(session=session, validate=True,
-                                                chat_id=token.id, table_id=user_cash_account.table_id)
+            query = (select(CashAccount).
+                     options(joinedload(CashAccount.currencies)).
+                     filter_by(chat_id=token.id, table_id=user_cash_account.table_id)
+                     )
+            cash_account: Result = await session.execute(query)
+            cash_account: CashAccount = cash_account.scalars().first()
+            if not cash_account:
+                raise StandartException(status_code=404, detail="not found")
+        target_currency = cash_account.currency
         if user_cash_account.currency:
-            result.currency = user_cash_account.currency
-        result = UserCashAccountRead.model_validate(result, from_attributes=True)
-        result.balance = await self.work_with_money.convert(base_currency=result.currency,
-                                                       convert_currency="RUB",
-                                                       amount=result.balance)
-        return GenericResponse[UserCashAccountRead](detail=result)
+            target_currency = user_cash_account.currency
+        balance = Decimal(0)
+        for cash_currencies in cash_account.currencies:
+            balance += await self.work_with_money.convert(base_currency=target_currency,
+                                                          convert_currency=cash_currencies.currency,
+                                                          amount=cash_currencies.amount)
+        response_data = UserCashAccountRead(
+            table_id=cash_account.table_id,
+            chat_id=cash_account.chat_id,
+            name=cash_account.name,
+            description=cash_account.description,
+            type=cash_account.type,
+            currency=target_currency,
+            balance=balance
+        )
+        return GenericResponse[UserCashAccountRead](detail=response_data)
 
 
     async def delete_user_cash_account(self,user_cash_account: UserCashAccountGet, token: JwtInfo) -> None:
