@@ -2,7 +2,8 @@ from abc import abstractmethod
 from typing import Protocol
 
 from secure import JwtInfo
-from .schemas import UserCategoryGet, UserCategoryPost, UserCategoryPatch, UserCategoriesRead, UserCategoryRead
+from .schemas import UserCategoryGet, UserCategoryPost, UserCategoryPatch, UserCategoriesRead, UserCategoryRead, \
+    UserCategoryDelete
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 
 class UserCategoriesServiceI(Protocol):
@@ -23,6 +24,6 @@ class UserCategoriesServiceI(Protocol):
         ...
 
     @abstractmethod
-    async def delete_user_category(self, user_category: UserCategoryGet, token: JwtInfo) -> None:
+    async def delete_user_category(self, user_category: UserCategoryDelete, token: JwtInfo) -> None:
         ...
 

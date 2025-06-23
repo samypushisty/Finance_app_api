@@ -81,9 +81,7 @@ class DependencyContainer(containers.DeclarativeContainer):
                                                                          work_with_money=work_with_money_repository,
                                                                          repository=categories_repository,
                                                                          database_session=database_session,
-                                                                         movies_repository=movies_repository,
-                                                                         balance_repository=balance_repository,
-                                                                         cash_account_repository=cash_account_repository)
+                                                                         movies_repository=movies_repository)
     user_cash_accounts_service: Factory["UserCashAccountsServiceI"] = Factory(UserCashAccountsService,
                                                                               work_with_money=work_with_money_repository,
                                                                               repository=cash_account_repository,

@@ -3,7 +3,7 @@ from api.api_v1.services.environment_settings.CRUD_user_categories import UserCa
 from api.api_v1.container import container
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 from api.api_v1.services.environment_settings.CRUD_user_categories.schemas import UserCategoryPost, UserCategoriesRead, \
-    UserCategoryPatch, UserCategoryGet, UserCategoryRead
+    UserCategoryPatch, UserCategoryGet, UserCategoryRead, UserCategoryDelete
 from secure import JwtInfo
 from secure.jwt_functions import validation
 
@@ -47,7 +47,7 @@ async def get_category(
 
 @router.delete("")
 async def delete_category(
-        user_category: UserCategoryGet = Depends(),
+        user_category: UserCategoryDelete = Depends(),
         token: JwtInfo = Depends(validation),
         user_category_service = Depends(get_user_categories_service),
         ):
