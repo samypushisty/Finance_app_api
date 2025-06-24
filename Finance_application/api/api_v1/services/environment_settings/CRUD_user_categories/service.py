@@ -57,7 +57,7 @@ class UserCategoriesService(UserCategoriesServiceI):
         for category in categories:
             balance = Decimal('0.00').quantize(Decimal('0.00'))
             for category_currency in category.currencies:
-                balance += await self.work_with_money.convert(base_currency=category_currency.currency,
+                balance -= await self.work_with_money.convert(base_currency=category_currency.currency,
                                                               convert_currency=category_currency.currency,
                                                               amount=category_currency.amount)
             response_data = UserCategoryRead(
@@ -88,7 +88,7 @@ class UserCategoriesService(UserCategoriesServiceI):
             target_currency = user_category.currency
         balance = Decimal('0.00').quantize(Decimal('0.00'))
         for category_currencies in category.currencies:
-            balance += await self.work_with_money.convert(base_currency=target_currency,
+            balance -= await self.work_with_money.convert(base_currency=target_currency,
                                                           convert_currency=category_currencies.currency,
                                                           amount=category_currencies.amount)
         response_data = UserCategoryRead(

@@ -52,8 +52,6 @@ class SQLAlchemyRepository(AbstractRepository):
     async def add(self, session: AsyncSession, data: dict):
 
         try:
-            print("add")
-            print(session)
             stmt = self.model(**data)
             session.add(stmt)
             await session.flush()
@@ -63,8 +61,6 @@ class SQLAlchemyRepository(AbstractRepository):
 
 
     async def find(self, session: AsyncSession, validate: bool = False,**filters):
-        print("find")
-        print(session)
         query = (
             select(self.model)
             .filter_by(**filters)
@@ -77,8 +73,6 @@ class SQLAlchemyRepository(AbstractRepository):
 
 
     async def find_all(self, session: AsyncSession, order_column: str, validate: bool = False, **filters):
-        print("find all")
-        print(session)
         query = (
             select(self.model)
             .filter_by(**filters)
@@ -109,8 +103,6 @@ class SQLAlchemyRepository(AbstractRepository):
 
 
     async def patch(self, session: AsyncSession, data: dict, **filters):
-        print("patch")
-        print(session)
         stmt = (
             update(self.model)
             .values(**data)
@@ -126,8 +118,6 @@ class SQLAlchemyRepository(AbstractRepository):
         await session.flush()
 
     async def patch_field(self, session: AsyncSession, field: str, value: Decimal, **filters):
-        print("patch_field")
-        print(session)
         stmt = (
             update(self.model)
             .values({field : getattr(self.model, field) + value})
@@ -143,12 +133,9 @@ class SQLAlchemyRepository(AbstractRepository):
         if result is None:
             raise StandartException(status_code=404, detail="not found")
         await session.flush()
-        print(result)
         return result
 
     async def delete(self, session: AsyncSession,validate = True,**filters):
-        print("delete")
-        print(session)
         query = (
             delete(self.model)
             .filter_by(**filters)

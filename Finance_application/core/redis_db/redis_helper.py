@@ -33,6 +33,4 @@ async_redis_client = redis_async.Redis(
 @asynccontextmanager
 async def redis_session_getter():
     async with async_redis_client as session:
-        print("open_r")
         yield session
-        print("close_r")
