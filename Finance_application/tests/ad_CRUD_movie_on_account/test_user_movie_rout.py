@@ -26,6 +26,7 @@ data_test = DataForTestMovieOnAccount()
                           DataForFixture(id=1234567897,data=DataDTO(status_code=404,data=data_test.input_wrong_user_o)),
                           DataForFixture(id=1234567897,data=DataDTO(status_code=404,data=data_test.input_wrong_user_e)),
                           DataForFixture(id=9999999999,data=DataDTO(status_code=403,data=data_test.input_wrong_balance_0)),
+                          DataForFixture(id=9999999999,data=DataDTO(status_code=403,data=data_test.input_wrong_balance_0_currency)),
                           DataForFixture(id="www",data=DataDTO(status_code=401,data=data_test.input_e2_c2))],
                          indirect=True, scope="function", ids=idfn)
 def test_post(client,data_for_test):
@@ -167,6 +168,6 @@ def test_get_all_patch(client,data_for_test):
     assert response.status_code == data_for_test.data.status_code
     if response.status_code == 200:
         data = data_test.for_test_patch
-        for i in range(3):
+        for i in range(5):
             assert answer["detail"]["movies"][i] == data[i]
         assert len(answer["detail"]["movies"]) == len(data)

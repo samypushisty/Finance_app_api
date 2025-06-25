@@ -53,6 +53,7 @@ class AbstractConverter(ABC):
                                  category_id: int,
                                  cash_id: int,
                                  amount: Decimal,
+                                 currency: str,
                                  type_operation: Literal["earning", "outlay"]):
         ...
 
@@ -115,7 +116,8 @@ class WorkWithMoneyRepository(AbstractConverter):
                 if currencies_earning.currency == currency:
                     count_earning_currency += currencies_earning.amount
 
-            category_currency: CategoryCurrency = next((c for c in category_table.currencies if c.currency == currency), None)
+            category_currency: CategoryCurrency = next(
+                (c for c in category_table.currencies if c.currency == currency and c.cash_account_id ==cash_id), None)
 
             if count_earning_currency < amount:
                 raise StandartException(status_code=403, detail="cash_balance_this_currency < 0")
@@ -137,7 +139,8 @@ class WorkWithMoneyRepository(AbstractConverter):
             if not earning_table:
                 raise StandartException(status_code=404, detail="not_found")
 
-            earnings_currency: EarningsCurrency = next((c for c in earning_table.currencies if c.currency == currency), None)
+            earnings_currency: EarningsCurrency = next(
+                (c for c in earning_table.currencies if c.currency == currency and c.cash_account_id == cash_id), None)
             if not earnings_currency:
                 earning_table.currencies.append(
                     EarningsCurrency(chat_id=chat_id, cash_account_id=cash_id, currency=currency, amount=amount)
@@ -157,7 +160,6 @@ class WorkWithMoneyRepository(AbstractConverter):
                                old_currency: str,
                                type_operation: str):
         if type_operation == "earning":
-            print(new_currency, new_amount, old_currency, old_amount)
             query = (select(CashAccount).
                      options(joinedload(CashAccount.currencies_earnings),
                              joinedload(CashAccount.currencies_outlays)).
@@ -170,21 +172,18 @@ class WorkWithMoneyRepository(AbstractConverter):
             for currencies_outlays in cash_table.currencies_outlays:
                 if currencies_outlays.currency == old_currency:
                     count_old_outlay_currency+=currencies_outlays.amount
-            print(count_old_outlay_currency)
+
             if not cash_table:
                 raise StandartException(status_code=404, detail="not_found")
 
             earnings_currency_new: EarningsCurrency = next(
                 (c for c in cash_table.currencies_earnings if c.currency == new_currency and c.earnings_id == earning_id), None)
             if not earnings_currency_new:
-                print("создаём новый обьект")
                 cash_table.currencies_earnings.append(
                     EarningsCurrency(chat_id=chat_id, earnings_id=earning_id, currency=new_currency, amount=new_amount)
                 )
             else:
-                print("добовляем к существующему")
                 earnings_currency_new.amount += new_amount
-                print(new_currency,earnings_currency_new.amount)
             if old_currency == new_currency:
                 earnings_currency_old = earnings_currency_new
             else:
@@ -196,12 +195,11 @@ class WorkWithMoneyRepository(AbstractConverter):
                 raise StandartException(status_code=403, detail="cash_balance_this_currency < 0")
             else:
                 earnings_currency_old.amount -= old_amount
-                print(old_currency,earnings_currency_old.amount)
                 if earnings_currency_old.amount == Decimal('0.00'):
                     await session.delete(earnings_currency_old)
 
         elif type_operation == "outlay":
-            print(new_currency,new_amount,old_currency,old_amount)
+
             #таблица с кеш аккаунтами
             query = (select(CashAccount).
                      options(joinedload(CashAccount.currencies_earnings),
@@ -216,7 +214,7 @@ class WorkWithMoneyRepository(AbstractConverter):
             for currencies_earning in cash_table.currencies_earnings:
                 if currencies_earning.currency == new_currency:
                     count_new_earning_currency += currencies_earning.amount
-            print(count_new_earning_currency)
+
             # если заработанной валюты такой нет значит я её потратить не могу
             if count_new_earning_currency == Decimal('0.00'):
                 raise StandartException(status_code=403, detail="cash_balance_this_currency < 0")
@@ -230,14 +228,12 @@ class WorkWithMoneyRepository(AbstractConverter):
 
 
             if not category_new_currency:
-                print("создаём новый обьект")
                 cash_table.currencies_outlays.append(
                     CategoryCurrency(chat_id=chat_id, category_id=category_id, currency=new_currency, amount=new_amount)
                 )
             else:
-                print("добовляем к существующему")
                 category_new_currency.amount += new_amount
-                print(new_currency,category_new_currency.amount)
+
                 # проверка на то что потаченных денег не больше заработанных
                 if new_currency == old_currency:
                     if category_new_currency.amount-old_amount > count_new_earning_currency:
@@ -254,9 +250,7 @@ class WorkWithMoneyRepository(AbstractConverter):
                      c.currency == old_currency and c.category_id == category_id), None)
 
             category_old_currency.amount -= old_amount
-            print(category_old_currency.amount)
             if category_old_currency.amount == Decimal('0.00'):
-                print("удаляем старый")
                 await session.delete(category_old_currency)
 
 
@@ -265,36 +259,57 @@ class WorkWithMoneyRepository(AbstractConverter):
                                  earning_id: int,
                                  category_id: int,
                                  cash_id: int,
+                                 currency: str,
                                  amount: Decimal,type_operation: str):
-        # получение нужных балансов
-        balance_cash_account = 0
-        balance_main_account = 0
+        if type_operation == "outlay":
+            query = (select(Category).
+                     options(joinedload(Category.currencies)).
+                     filter_by(table_id=category_id, chat_id=chat_id)
+                     )
+            category_table: Result = await session.execute(query)
+            category_table: Category = category_table.scalars().first()
+
+            if not category_table:
+                raise StandartException(status_code=404, detail="not_found")
+
+
+            category_currency: CategoryCurrency = next(
+                (c for c in category_table.currencies if c.currency == currency and c.cash_account_id == cash_id), None)
+
+            category_currency.amount -= amount
+
+            if category_currency.amount == Decimal('0.00'):
+                await session.delete(category_currency)
+
 
         if type_operation == "earning":
-            balance_type_of_earnings = await self.repository_type_of_earnings.patch_field(session=session,
-                                                                                          field="balance",
-                                                                                          value=-amount,
-                                                                                          chat_id=chat_id,
-                                                                                          table_id=earning_id)
-            if balance_type_of_earnings < 0:
-                raise StandartException(status_code=403, detail="type_of_earnings < 0")
-            balance_cash_account = await self.repository_cash_account.patch_field(session=session, field="balance",
-                                                                                  value=-amount,
-                                                                                  chat_id=chat_id,
-                                                                                  table_id=cash_id)
-            balance_main_account = await self.repository_balance.patch_field(session=session, field="balance",
-                                                                             value=-amount,
-                                                                             chat_id=chat_id)
-        elif type_operation == "outlay":
-            balance_categories = await self.repository_categories.patch_field(session=session, field="balance",
-                                                         value=amount, chat_id=chat_id,
-                                                         table_id=category_id)
-            balance_cash_account = await self.repository_cash_account.patch_field(session=session, field="balance",
-                                                                                  value=amount, chat_id=chat_id,
-                                                                                  table_id=cash_id)
-            balance_main_account = await self.repository_balance.patch_field(session=session, field="balance",
-                                                                             value=amount, chat_id=chat_id)
-            if balance_categories > 0:
-                raise StandartException(status_code=403, detail="old_balance_categories > 0")
-        if balance_main_account < 0 or balance_cash_account < 0:
-            raise StandartException(status_code=403, detail="balance < 0")
+            query = (select(CashAccount).
+                     options(joinedload(CashAccount.currencies_outlays)).
+                     filter_by(table_id=cash_id, chat_id=chat_id)
+                     )
+            cash_table: Result = await session.execute(query)
+            cash_table: CashAccount = cash_table.scalars().first()
+
+            query = (select(Earnings).
+                     options(joinedload(Earnings.currencies)).
+                     filter_by(table_id=earning_id, chat_id=chat_id)
+                     )
+            earnings_table: Result = await session.execute(query)
+            earnings_table: Earnings = earnings_table.scalars().first()
+
+            if not (earnings_table and cash_table):
+                raise StandartException(status_code=404, detail="not_found")
+
+            count_outlay_currency = Decimal('0.00').quantize(Decimal('0.00'))
+            for currencies_outlay in cash_table.currencies_outlays:
+                if currencies_outlay.currency == currency:
+                    count_outlay_currency += currencies_outlay.amount
+
+            earning_currency: EarningsCurrency = next(
+                (c for c in earnings_table.currencies if c.currency == currency and c.cash_account_id == cash_id), None)
+
+            if count_outlay_currency > earning_currency.amount-amount:
+                raise StandartException(status_code=403, detail="cash_balance_this_currency < 0")
+            earning_currency.amount -= amount
+            if earning_currency.amount == Decimal('0.00'):
+                await session.delete(earning_currency)

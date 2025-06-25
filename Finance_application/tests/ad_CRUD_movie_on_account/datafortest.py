@@ -78,8 +78,17 @@ class DataForTestMovieOnAccount:
             "description": "string",
             "type": "outlay",
             "worth": 2000,
-            "currency": "USD",
+            "currency": "BYN",
             "cash_account": 3,
+            "categories_id": 3
+        }
+        self.input_wrong_balance_0_currency = {
+            "title": "string",
+            "description": "string",
+            "type": "outlay",
+            "worth": 5,
+            "currency": "BYN",
+            "cash_account": 2,
             "categories_id": 3
         }
 
@@ -288,7 +297,7 @@ class DataForTestMovieOnAccount:
                 "description": "string",
                 "type": "earning",
                 "worth": "1000.00",
-                "currency": "EUR",
+                "currency": "USD",
                 "cash_account": 3,
                 "earnings_id": 3,
                 "categories_id": None
@@ -299,10 +308,33 @@ class DataForTestMovieOnAccount:
                 "title": "string",
                 "description": "string",
                 "type": "outlay",
-                "worth": "400.00",
+                "worth": "200.00",
                 "currency": "USD",
                 "cash_account": 2,
                 "categories_id": 2,
                 "earnings_id": None
-            }
-            ]
+            },
+            {
+                "chat_id": 9999999999,
+                "table_id": 5,
+                "title": "string",
+                "description": "string",
+                "type": "earning",
+                "worth": "1000.00",
+                "currency": "USD",
+                "cash_account": 3,
+                "earnings_id": 3,
+                "categories_id": None
+            },
+            {
+                "chat_id": 9999999999,
+                "table_id": 6,
+                "title": "string",
+                "description": "string",
+                "type": "outlay",
+                "worth": "100.00",
+                "currency": "USD",
+                "cash_account": 3,
+                "categories_id": 3,
+                "earnings_id": None
+            }]
