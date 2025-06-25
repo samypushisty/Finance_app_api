@@ -3,7 +3,7 @@ from api.api_v1.container import container
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 from api.api_v1.services.environment_settings.CRUD_user_earnings import UserEarningsServiceI
 from api.api_v1.services.environment_settings.CRUD_user_earnings.schemas import UserTypeEarningsGet, \
-    UserTypeEarningsRead, UserTypesEarningsRead, UserTypeEarningsPatch, UserTypeEarningsPost
+    UserTypeEarningsRead, UserTypesEarningsRead, UserTypeEarningsPatch, UserTypeEarningsPost, UserTypeEarningsDelete
 from secure import JwtInfo
 from secure.jwt_functions import validation
 
@@ -47,7 +47,7 @@ async def get_type_earnings(
 
 @router.delete("")
 async def delete_type_earnings(
-        user_type_of_earnings: UserTypeEarningsGet = Depends(),
+        user_type_of_earnings: UserTypeEarningsDelete = Depends(),
         token: JwtInfo = Depends(validation),
         user_type_of_earnings_service = Depends(get_user_type_of_earnings_service),
         ):

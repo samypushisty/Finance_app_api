@@ -15,9 +15,4 @@ celery_app.conf.beat_schedule = {
         "task": 'update_prices',
         "schedule": timedelta(seconds=30)
     },
-    # "update_balances": {
-    #     "task": 'update_balances',
-    #     "schedule": timedelta(seconds=30)
-    # },
-
 }

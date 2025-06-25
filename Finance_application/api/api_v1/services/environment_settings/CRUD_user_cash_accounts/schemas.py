@@ -9,7 +9,6 @@ from core.redis_db.redis_helper import redis_client
 
 
 class UserCashAccountPost(BaseModel):
-    balance: Decimal = Field(ge=0, decimal_places=2)
     name: str = Field(max_length=15)
     description: Optional[str] = Field(None, max_length=256)
     type: CashAccountType
@@ -51,6 +50,9 @@ class UserCashAccountGet(BaseModel):
         if not redis_client.exists(value):
             raise StandartException(status_code=401, detail=f"Currency '{value}' does not exist in Redis")
         return value
+
+class UserCashAccountDelete(BaseModel):
+    table_id: int
 
 
 class UserCashAccountRead(BaseModel):

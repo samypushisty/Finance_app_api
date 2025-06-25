@@ -1,8 +1,8 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, Annotated
-from sqlalchemy import ForeignKey, text, String, MetaData, BigInteger, Numeric
-from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
+from typing import Optional, Annotated, List
+from sqlalchemy import ForeignKey, text, String, MetaData, BigInteger, Numeric, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 from core.config import settings
 import enum
 
@@ -56,11 +56,19 @@ class CashAccount(Base):
 
     table_id: Mapped[intpk]
     chat_id: Mapped[intfk]
-    balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     name: Mapped[str_15]
     description: Mapped[Optional[str_256]]
     type: Mapped[CashAccountType]
     currency: Mapped[str_3]
+
+    currencies_earnings: Mapped[List["EarningsCurrency"]] = relationship(
+        back_populates="cash_account",
+        cascade="all, delete-orphan"
+    )
+    currencies_outlays: Mapped[List["CategoryCurrency"]] = relationship(
+        back_populates="cash_account",
+        cascade="all, delete-orphan"
+    )
 
 
 class Category(Base):
@@ -71,8 +79,28 @@ class Category(Base):
     month_limit: Mapped[float]
     name: Mapped[str_15]
     description: Mapped[Optional[str_256]]
-    balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     currency: Mapped[str_3]
+    currencies: Mapped[List["CategoryCurrency"]] = relationship(
+        back_populates="category",
+        cascade="all, delete-orphan"
+    )
+
+class CategoryCurrency(Base):
+    __tablename__ = "category_currency"
+    __table_args__ = (
+        UniqueConstraint('category_id','cash_account_id', 'currency', name='_category_currency_uc'),
+    )
+
+    table_id: Mapped[intpk]
+    chat_id: Mapped[intfk]
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.table_id", ondelete="CASCADE"))
+    cash_account_id: Mapped[int] = mapped_column(ForeignKey("cash_account.table_id", ondelete="CASCADE"))
+    currency: Mapped[str_3]
+    amount: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
+
+    category: Mapped["Category"] = relationship(back_populates="currencies")
+    cash_account: Mapped["CashAccount"] = relationship(back_populates="currencies_outlays",
+                                                       passive_deletes=True)
 
 class Earnings(Base):
     __tablename__ = "earnings"
@@ -81,11 +109,29 @@ class Earnings(Base):
     chat_id: Mapped[intfk]
     name: Mapped[str_15]
     description: Mapped[Optional[str_256]]
-    balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     currency: Mapped[str_3]
+    currencies: Mapped[List["EarningsCurrency"]] = relationship(
+        back_populates="earning",
+        cascade="all, delete-orphan"
+    )
+
+class EarningsCurrency(Base):
+    __tablename__ = "earnings_currency"
+    __table_args__ = (
+        UniqueConstraint('earnings_id','cash_account_id', 'currency', name='_earnings_currency_uc'),
+    )
+
+    table_id: Mapped[intpk]
+    chat_id: Mapped[intfk]
+    earnings_id: Mapped[int] = mapped_column(ForeignKey("earnings.table_id", ondelete="CASCADE"))
+    cash_account_id: Mapped[int] = mapped_column(ForeignKey("cash_account.table_id", ondelete="CASCADE"))
+    currency: Mapped[str_3]
+    amount: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
+
+    earning: Mapped["Earnings"] = relationship(back_populates="currencies")
+    cash_account: Mapped["CashAccount"] = relationship(back_populates="currencies_earnings")
 
 
-# таблица с сетами
 class UserSettings(Base):
     __tablename__ = "settings"
 
@@ -108,7 +154,6 @@ class MovieOnAccount(Base):
     type: Mapped[MovieType]
     worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     currency: Mapped[str_3]
-    base_worth: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     cash_account: Mapped[int] = mapped_column(ForeignKey("cash_account.table_id", ondelete="CASCADE"))
     categories_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("category.table_id", ondelete="CASCADE"))
     earnings_id: Mapped[Optional[int]] = mapped_column(None, ForeignKey("earnings.table_id", ondelete="CASCADE"))
@@ -118,5 +163,4 @@ class MovieOnAccount(Base):
 class Balance(Base):
     __tablename__ = "balance"
     chat_id: Mapped[intfkpk]
-    balance: Mapped[Decimal] = mapped_column(Numeric(precision=100, scale=2))
     balances_history: Mapped[str]

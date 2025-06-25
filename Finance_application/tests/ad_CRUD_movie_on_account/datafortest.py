@@ -37,6 +37,24 @@ class DataForTestMovieOnAccount:
             "cash_account": 3,
             "categories_id": 3
         }
+        self.input_e3_c3_byn = {
+            "title": "string",
+            "description": "string",
+            "type": "earning",
+            "worth": 1000,
+            "currency": "BYN",
+            "cash_account": 3,
+            "earnings_id": 3
+        }
+        self.input_o3_c3_byn = {
+            "title": "string",
+            "description": "string",
+            "type": "outlay",
+            "worth": 100,
+            "currency": "BYN",
+            "cash_account": 3,
+            "categories_id": 3
+        }
         self.input_wrong_user_e = {
             "title": "string",
             "description": "string",
@@ -60,8 +78,17 @@ class DataForTestMovieOnAccount:
             "description": "string",
             "type": "outlay",
             "worth": 2000,
-            "currency": "USD",
+            "currency": "BYN",
             "cash_account": 3,
+            "categories_id": 3
+        }
+        self.input_wrong_balance_0_currency = {
+            "title": "string",
+            "description": "string",
+            "type": "outlay",
+            "worth": 5,
+            "currency": "BYN",
+            "cash_account": 2,
             "categories_id": 3
         }
 
@@ -163,16 +190,17 @@ class DataForTestMovieOnAccount:
         }
 
         self.new_id_2 = {
-            "table_id": 2,
-            "currency": "EUR"
-        }
-        self.new_id_3 = {
             "table_id": 3,
-            "worth": 400
+            "worth": 200,
+        }
+
+        self.new_id_3 = {
+            "table_id": 6,
+            "currency": "USD",
         }
         self.new_id_4 = {
-            "table_id": 4,
-            "currency": "eur"
+            "table_id": 5,
+            "currency": "USD",
         }
 
         self.for_test = [
@@ -223,6 +251,30 @@ class DataForTestMovieOnAccount:
             "cash_account": 3,
             "categories_id": 3,
             "earnings_id": None
+        },
+        {
+            "chat_id": 9999999999,
+            "table_id": 5,
+            "title": "string",
+            "description": "string",
+            "type": "earning",
+            "worth": "1000.00",
+            "currency": "BYN",
+            "cash_account": 3,
+            "earnings_id": 3,
+            "categories_id": None
+        },
+        {
+            "chat_id": 9999999999,
+            "table_id": 6,
+            "title": "string",
+            "description": "string",
+            "type": "outlay",
+            "worth": "100.00",
+            "currency": "BYN",
+            "cash_account": 3,
+            "categories_id": 3,
+            "earnings_id": None
         }]
 
         self.for_test_patch = [
@@ -245,7 +297,7 @@ class DataForTestMovieOnAccount:
                 "description": "string",
                 "type": "earning",
                 "worth": "1000.00",
-                "currency": "EUR",
+                "currency": "USD",
                 "cash_account": 3,
                 "earnings_id": 3,
                 "categories_id": None
@@ -256,10 +308,33 @@ class DataForTestMovieOnAccount:
                 "title": "string",
                 "description": "string",
                 "type": "outlay",
-                "worth": "400.00",
+                "worth": "200.00",
                 "currency": "USD",
                 "cash_account": 2,
                 "categories_id": 2,
                 "earnings_id": None
-            }
-            ]
+            },
+            {
+                "chat_id": 9999999999,
+                "table_id": 5,
+                "title": "string",
+                "description": "string",
+                "type": "earning",
+                "worth": "1000.00",
+                "currency": "USD",
+                "cash_account": 3,
+                "earnings_id": 3,
+                "categories_id": None
+            },
+            {
+                "chat_id": 9999999999,
+                "table_id": 6,
+                "title": "string",
+                "description": "string",
+                "type": "outlay",
+                "worth": "100.00",
+                "currency": "USD",
+                "cash_account": 3,
+                "categories_id": 3,
+                "earnings_id": None
+            }]

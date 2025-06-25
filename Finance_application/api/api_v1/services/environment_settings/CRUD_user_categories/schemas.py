@@ -47,6 +47,10 @@ class UserCategoryGet(BaseModel):
         return value
 
 
+class UserCategoryDelete(BaseModel):
+    table_id: int
+
+
 class UserCategoryRead(BaseModel):
     table_id: int
     chat_id: int = Field(ge=10000000, le=10000000000)

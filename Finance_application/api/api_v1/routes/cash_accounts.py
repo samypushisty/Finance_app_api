@@ -3,7 +3,7 @@ from api.api_v1.services.environment_settings.CRUD_user_cash_accounts import Use
 from api.api_v1.container import container
 from api.api_v1.services.base_schemas.schemas import GenericResponse
 from api.api_v1.services.environment_settings.CRUD_user_cash_accounts.schemas import UserCashAccountPost, \
-    UserCashAccountPatch, UserCashAccountsRead, UserCashAccountRead, UserCashAccountGet
+    UserCashAccountPatch, UserCashAccountsRead, UserCashAccountRead, UserCashAccountGet, UserCashAccountDelete
 from secure import JwtInfo
 from secure.jwt_functions import validation
 
@@ -48,7 +48,7 @@ async def get_category(
 
 @router.delete("")
 async def delete_category(
-        user_cash_account: UserCashAccountGet = Depends(),
+        user_cash_account: UserCashAccountDelete = Depends(),
         token: JwtInfo = Depends(validation),
         user_cash_account_service = Depends(get_user_cash_accounts_service),
         ):

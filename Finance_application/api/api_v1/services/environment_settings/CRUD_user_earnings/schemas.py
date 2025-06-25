@@ -46,6 +46,9 @@ class UserTypeEarningsGet(BaseModel):
             raise StandartException(status_code=401, detail=f"Currency '{value}' does not exist in Redis")
         return value
 
+class UserTypeEarningsDelete(BaseModel):
+    table_id: int
+
 
 class UserTypeEarningsRead(BaseModel):
     table_id: int
