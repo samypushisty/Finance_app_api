@@ -1,7 +1,8 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Annotated, List
-from sqlalchemy import ForeignKey, text, String, MetaData, BigInteger, Numeric, UniqueConstraint
+from sqlalchemy import ForeignKey, text, String, MetaData, BigInteger, Numeric, UniqueConstraint, ARRAY, event
+from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 from core.config import settings
 import enum
@@ -45,11 +46,9 @@ class Theme(enum.Enum):
 
 class User(Base):
     __tablename__ = "user"
-
     chat_id: Mapped[int] = mapped_column( BigInteger, primary_key=True, autoincrement=False)
     registration: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
     last_visit: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
-
 
 class CashAccount(Base):
     __tablename__ = "cash_account"
@@ -163,4 +162,15 @@ class MovieOnAccount(Base):
 class Balance(Base):
     __tablename__ = "balance"
     chat_id: Mapped[intfkpk]
-    balances_history: Mapped[str]
+    balances_history: Mapped[list[Decimal]] = mapped_column(
+        MutableList.as_mutable(ARRAY(Numeric(19, 2))),
+        nullable=False,
+        server_default="{}"
+    )
+
+@event.listens_for(Balance, 'before_insert', propagate=True)
+@event.listens_for(Balance, 'before_update', propagate=True)
+def truncate_balances_history(mapper, connection, target):
+    if len(target.balances_history) > 365:
+        target.balances_history = target.balances_history[-365:]
+

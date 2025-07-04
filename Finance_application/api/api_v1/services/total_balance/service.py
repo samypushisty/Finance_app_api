@@ -29,23 +29,18 @@ class UserBalanceService(UserBalanceServiceI):
 
     async def get_balances(self, balance: BalanceGet, token: JwtInfo) -> GenericResponse[BalancesHistoryRead]:
         async with self.session() as session:
+            convert_coef = 1
             result = await self.repository.find(session=session,validate=True,chat_id=token.id)
             if balance.currency:
-                currency = balance.currency
-            else:
                 settings = await self.repository_settings.find(session=session, validate=True, chat_id=token.id)
-                currency = settings.main_currency
-
-        convert_coef = 1
-
-        if not "RUB" == currency:
-            async with self.db_redis() as session:
-                price_base  = Decimal(await session.get("RUB"))
-                price_convert = Decimal(await session.get(currency))
-                convert_coef = (price_base/price_convert).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+                main_currency = settings.main_currency
+                async with self.db_redis() as redis_session:
+                    price_base = Decimal(await redis_session.get(balance.currency))
+                    price_convert = Decimal(await redis_session.get(main_currency))
+                    convert_coef = (price_convert / price_base).quantize(Decimal("0.000000"), rounding=ROUND_HALF_UP)
 
         result = list(map(lambda x: (Decimal(x)/convert_coef).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP),
-                          result.balances_history.split()))
+                          result.balances_history))
         result = BalancesHistoryRead(balances_history=result)
         return GenericResponse[BalancesHistoryRead](detail=result)
 

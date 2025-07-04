@@ -13,6 +13,10 @@ celery_app = Celery(
 celery_app.conf.beat_schedule = {
     "update_prices": {
         "task": 'update_prices',
-        "schedule": timedelta(seconds=30)
+        "schedule": timedelta(hours=1)
     },
+    "balances_history": {
+        "task": 'balances_history',
+        "schedule": timedelta(days=1)
+    }
 }
